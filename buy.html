@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buy - CampusConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      margin: 0;
+      padding-top: 80px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .product-card {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      background: #fff;
+      text-align: center;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 2px solid #eee;
+    }
+    .product-details {
+      padding: 15px;
+    }
+    .product-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .info {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .buy-btn {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .buy-btn:hover {
+      background: #0056b3;
+    }
+    .search-bar {
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .modal-content {
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-light bg-light shadow-sm w-100 fixed-top">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <button class="btn btn-outline-secondary me-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+        ☰
+      </button>
+      <span class="navbar-brand mb-0 h1 fw-bold position-absolute start-50 translate-middle-x">
+        CampusConnect
+      </span>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Menu</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="list-unstyled">
+        <li><a href="home.html" class="btn btn-outline-primary w-100 mb-2">Home</a></li>
+        <li><a href="contact.html" class="btn btn-outline-success w-100 mb-2">Contact Us</a></li>
+        <li><a href="login.html" class="btn btn-outline-danger w-100">Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <div class="container">
+    <h3 class="fw-bold text-center mb-4">Available Products</h3>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search products...">
+    </div>
+
+    <div class="row g-4" id="productContainer">
+      <!-- Products will be dynamically loaded here -->
+    </div>
+
+    <div class="text-center">
+      <a href="home.html" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+  </div>
+
+  <!-- Dummy Payment Modal -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-3">
+        <h5 class="fw-bold mb-3">Choose Payment Method</h5>
+        <p class="text-muted mb-3">Select your preferred option:</p>
+        <div class="d-flex justify-content-around mb-3">
+          <button class="btn btn-outline-success" id="codBtn">💸 Cash on Delivery</button>
+          <button class="btn btn-outline-primary" id="gpayBtn">📱 GPay</button>
+        </div>
+        <p id="paymentStatus" class="text-success fw-bold d-none">✅ Payment Successful (Dummy)</p>
+        <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  const placeholder = "https://via.placeholder.com/300x220?text=No+Image";
+
+  async function loadProducts() {
+    try {
+      const res = await fetch("http://localhost:5000/api/products/sale", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const products = await res.json();
+      const container = $("#productContainer");
+      container.empty();
+
+      if (!products.length) {
+        container.html('<p class="text-center">No products available at the moment.</p>');
+        return;
+      }
+
+      products.forEach(prod => {
+        const img = prod.imageUrl || placeholder;
+        const title = prod.title || "Unnamed Product";
+        const seller = prod.user?.name || "Unknown";
+       // const regno = prod.user?.regno || "N/A";
+        const contact = prod.user?.phone || "N/A";
+
+        const card = `
+          <div class="col-md-3 col-sm-6">
+            <div class="product-card">
+              <img src="${img}" alt="${title}">
+              <div class="product-details">
+                <div class="product-name">${title}</div>
+                <div class="info">👤 Seller: <strong>${seller}</strong></div>
+                <div class="info">📞 Contact: ${contact}</div>
+                <button class="buy-btn mt-3" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        container.append(card);
+      });
+
+    } catch (err) {
+      console.error("Error loading products:", err);
+      $("#productContainer").html('<p class="text-center text-danger">Failed to load products.</p>');
+    }
+  }
+
+  $(document).ready(function(){
+    loadProducts();
+
+    // Search filter
+    $("#searchInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#productContainer .product-card").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+
+    // Dummy payment simulation
+    $("#gpayBtn, #codBtn").click(function(){
+      $("#paymentStatus").removeClass("d-none").text("✅ Payment Successful (Dummy)");
+      setTimeout(() => {
+        $("#paymentModal").modal('hide');
+        $("#paymentStatus").addClass("d-none");
+      }, 2000);
+    });
+  });
+  </script>
+
+</body>
+</html>

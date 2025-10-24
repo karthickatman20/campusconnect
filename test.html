@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloudinary Test Upload</title>
+</head>
+<body>
+  <h2>Cloudinary Upload Test</h2>
+
+  <!-- File input -->
+  <input type="file" id="fileInput" />
+  <br><br>
+
+  <!-- Preview image -->
+  <img id="preview" src="" alt="Preview" style="max-width:200px; display:none;" />
+
+  <!-- Upload button -->
+  <button id="uploadBtn">Upload to Cloudinary</button>
+
+  <script>
+    const CLOUD_NAME = "do9vxkhgm";
+    const UPLOAD_PRESET = "campus_connect";
+
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    // Show image preview
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.type.startsWith("image/")) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    // Upload to Cloudinary
+    uploadBtn.addEventListener("click", async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select a file first!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      console.log("Uploading file:", file.name, file.type, file.size);
+      console.log("Cloudinary URL:", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        console.log("Cloudinary response:", data);
+
+        if (res.ok && data.secure_url) {
+          alert("Upload successful! URL:\n" + data.secure_url);
+        } else {
+          alert("Upload failed: " + (data.error?.message || "Unknown error"));
+        }
+      } catch (err) {
+        alert("Cloudinary upload error: " + err.message);
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Profile - CampusConnect</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* Body & background */
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #5390d9, #80ffdb, #64dfdf);
+      background-size: 300% 300%;
+      animation: gradientShift 10s ease infinite;
+      font-family: 'Poppins', sans-serif;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Profile card */
+    .profile-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+      padding: 40px;
+      width: 90%;
+      max-width: 500px;
+      color: #fff;
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Profile image */
+    .profile-card img {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      object-fit: cover;
+      margin-bottom: 15px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.5);
+      transition: transform 0.3s ease;
+    }
+    .profile-card img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Headings & info */
+    .profile-card h3 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+    .profile-card p.text-light-50 {
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      opacity: 0.85;
+    }
+    .profile-info {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .profile-info p {
+      background: rgba(255,255,255,0.1);
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .profile-info p:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .profile-info i {
+      font-size: 1.2rem;
+      color: #fff;
+    }
+
+    /* Buttons */
+    .btn-glow {
+      background: #48bfe3;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 15px;
+      padding: 12px 25px;
+      margin-top: 25px;
+      transition: 0.3s ease;
+      box-shadow: 0 0 12px #48bfe3, 0 0 20px #48bfe3;
+    }
+    .btn-glow:hover {
+      background: #5e60ce;
+      box-shadow: 0 0 20px #5e60ce, 0 0 30px #5e60ce;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="profile-card" id="profileCard">
+    <img id="userImg" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Profile Picture">
+    <h3 id="userName">Loading...</h3>
+    <p class="text-light-50">CampusConnect Member</p>
+
+    <div class="profile-info">
+      <p><i class="bi bi-envelope-fill"></i> <span id="userEmail">Fetching...</span></p>
+      <p><i class="bi bi-telephone-fill"></i> <span id="userPhone">Fetching...</span></p>
+      <p><i class="bi bi-building"></i> <span id="userAddress">Fetching...</span></p>
+      <p><i class="bi bi-card-text"></i> Reg No: <span id="userReg">Fetching...</span></p>
+    </div>
+
+    <a href="home.html" class="btn btn-glow mt-3"><i class="bi bi-house-door"></i> Back to Home</a>
+  </div>
+
+  <script>
+    // Get userId from localStorage
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+
+    if (!userId || !token) {
+      alert("You must log in first!");
+      window.location.href = "login.html";
+    } else {
+      async function loadUserProfile() {
+        try {
+          const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error("User not found");
+
+          const user = await res.json();
+
+          document.getElementById("userName").textContent = user.name;
+          document.getElementById("userEmail").textContent = user.email;
+          document.getElementById("userPhone").textContent = user.phone;
+          document.getElementById("userAddress").textContent = user.address;
+          document.getElementById("userReg").textContent = user.regno;
+        } catch (err) {
+          document.getElementById("profileCard").innerHTML = `
+            <h3 class="text-danger">Failed to load profile</h3>
+            <p>${err.message}</p>
+          `;
+          console.error(err);
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadUserProfile);
+    }
+  </script>
+</body>
+</html>
