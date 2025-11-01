@@ -110,26 +110,48 @@ $(document).ready(function() {
       isValid = false;
     }
 
-    if (regno === "") {
-      $("#regnoError").text("Register number is required").show();
-      isValid = false;
-    }
+   let regnoPattern = /^[0-9]{2}[A-Z]{3}0{0,2}[1-9][0-9]{0,2}$|^[0-9]{2}[A-Z]{3}1000$/;
+      if (regno === "") {
+        $("#regnoError").text("Register number is required").show();
+        isValid = false;
+      } else if (!regnoPattern.test(regno)) {
+        $("#regnoError").text("Enter valid Register No (e.g., 23BCA0067, 23BCA0100)").show();
+        isValid = false;
+      } else {
+        $("#regnoError").hide();
+      }
 
-    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-      $("#emailError").text("Please enter a valid email address").show();
+    let emailPattern = /^[A-Za-z]+\.?[A-Za-z]+[0-9]{4}@vitstudent\.ac\.in$/;
+    if (email === "") {
+      $("#emailError").text("Email is required").show();
       isValid = false;
+    } else if (!emailPattern.test(email)) {
+      $("#emailError").text("Please enter a valid VIT student email address").show();
+      isValid = false;
+    } else {
+      $("#emailError").hide();
     }
 
     if (address === "") {
       $("#addressError").text("Address is required").show();
       isValid = false;
+    } else if (!/^[A-Za-z\s]+$/.test(address)) {
+      $("#addressError").text("Address should contain only letters").show();
+      isValid = false;
+    } else {
+      $("#addressError").hide();
     }
 
-    if (!/^[0-9]{10}$/.test(phone)) {
-      $("#phoneError").text("Phone number must be 10 digits").show();
-      isValid = false;
-    }
+    if (phone === "") {
+      $("#phoneError").text("Phone number is required").show();
+        isValid = false;
+      } else if (!/^[0-9]{10}$/.test(phone)) {
+        $("#phoneError").text("Phone number must be exactly 10 digits").show();
+        isValid = false;
+      } else {
+        $("#phoneError").hide();
+      }
+
 
     if (password.length < 6) {
       $("#passwordError").text("Password must be at least 6 characters").show();
