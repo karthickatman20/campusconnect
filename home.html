@@ -41,41 +41,6 @@
       margin-bottom: 15px;
     }
 
-    /* Reviews Section */
-    .review-card {
-      border-radius: 20px;
-      background: #f8f9fa;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      padding: 25px;
-      margin: 20px auto;
-      max-width: 500px;
-      text-align: center;
-      opacity: 0;
-      transform: translateX(100px);
-      animation: fadeSlide 1s forwards;
-    }
-    .review-card img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 10px;
-      border: 2px solid #007bff;
-    }
-    .review-card:nth-child(odd) {
-      animation-name: slideLeft;
-    }
-    .review-card:nth-child(even) {
-      animation-name: slideRight;
-    }
-    @keyframes slideLeft {
-      from { opacity: 0; transform: translateX(-100px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes slideRight {
-      from { opacity: 0; transform: translateX(100px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
   </style>
 </head>
 <body class="d-flex flex-column">
@@ -107,6 +72,7 @@
     <div class="offcanvas-body">
       <ul class="list-unstyled">
         <li><a href="profile.html" class="btn btn-outline-primary w-100 mb-2">View Profile</a></li>
+        <li><a href="orders.html" class="btn btn-outline-primary w-100 mb-2">My Orders</a></li>
         <li><a href="contact.html" class="btn btn-outline-success w-100 mb-2">Contact Us</a></li>
         <li><a href="login.html" class="btn btn-outline-danger w-100">Sign Out</a></li>
       </ul>
@@ -169,42 +135,7 @@
     </p>
   </div>
 
-  <!-- Reviews Section -->
-  <div class="container mt-5">
-    <h3 class="fw-bold text-center">What Students Say</h3>
-    <div class="row justify-content-center mt-4">
-      
-      <div class="col-md-6 review-card">
-        <img src="New folder\s1.jpg" alt="Student A">
-        <p>"Really helpful platform! I bought books for half the price."</p>
-        <small>- Abishek</small>
-      </div>
-
-      <div class="col-md-6 review-card">
-        <img src="New folder\s2.jpg" alt="Student B">
-        <p>"Sold my old calculator within 2 days. Great idea for students."</p>
-        <small>- Sachin</small>
-      </div>
-
-      <div class="col-md-6 review-card">
-        <img src="New folder\s3.jpg" alt="Student C">
-        <p>"I found my lost water bottle thanks to this app. Highly recommended!"</p>
-        <small>- Morgan</small>
-      </div>
-
-      <div class="col-md-6 review-card">
-        <img src="New folder\s4.png" alt="Student D">
-        <p>"This makes student-to-student sales super simple and trustworthy."</p>
-        <small>- Simon</small>
-      </div>
-
-      <div class="col-md-6 review-card">
-        <img src="New folder\s5.png" alt="Student E">
-        <p>"Very convenient! I’ll definitely keep using it."</p>
-        <small>- Clark</small>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Footer -->
   <footer>

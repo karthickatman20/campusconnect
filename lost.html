@@ -111,88 +111,122 @@
     </div>
   </div>
 
-  <!-- Dummy Payment Modal -->
-  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-center p-3">
-        <h5 class="fw-bold mb-3">Choose Payment Method</h5>
-        <p class="text-muted mb-3">Complete your purchase using one of the following:</p>
-        <div class="d-flex justify-content-around mb-3">
-          <button class="btn btn-outline-success">💸 Cash on Delivery</button>
-          <button class="btn btn-outline-primary">📱 GPay</button>
-        </div>
-        <p class="text-success fw-bold">✅ Dummy Portal: Payment Not Real</p>
-        <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Close</button>
+ <!-- Confirm Buy Modal -->
+<div class="modal fade" id="confirmBuyModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-3">
+      <h5>Are you sure you want to buy this product?</h5>
+      <div class="d-flex justify-content-around mt-3">
+        <button class="btn btn-success" id="confirmYes">Yes</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
       </div>
     </div>
   </div>
+</div>
+
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-  const placeholder = "https://dummyimage.com/300x220/ccc/000&text=No+Image";
+<script>
+const placeholder = "https://dummyimage.com/300x220/ccc/000&text=No+Image";
 
-  async function loadLostProducts() {
-    try {
-      const res = await fetch("http://localhost:5000/api/products/lost", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
+async function loadLostProducts() {
+  try {
+    const res = await fetch("http://localhost:5000/api/products/lost", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
 
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const products = await res.json();
-      const container = $("#lostProducts");
-      container.empty();
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const products = await res.json();
+    const container = $("#lostProducts");
+    container.empty();
 
-      if (!products.length) {
-        container.html('<p class="text-center text-light">No lost products found.</p>');
-        return;
-      }
+    if (!products.length) {
+      container.html('<p class="text-center text-light">No lost products found.</p>');
+      return;
+    }
 
-      for (const prod of products) {
-        const img = prod.imageUrl || placeholder;
-        const title = prod.title || "Unnamed Item";
-        const foundBy = prod.user?.name || "Unknown";
-        const regno = prod.user?.regno || "N/A";
-        const contact = prod.user?.phone || "N/A";
+    for (const prod of products) {
+      const img = prod.imageUrl || placeholder;
+      const title = prod.title || "Unnamed Item";
+      const foundBy = prod.user?.name || "Unknown";
+      const regno = prod.user?.regno || "N/A";
+      const contact = prod.user?.phone || "N/A";
 
-        const card = `
-          <div class="col-md-3 col-sm-6">
-            <div class="product-card">
-              <img src="${img}" alt="${title}">
-              <div class="product-details">
-                <div class="product-name">${title}</div>
-                <div class="info">👤 Found by: <strong>${foundBy}</strong></div>
-                <div class="info">🎓 Reg No: ${regno}</div>
-                <div class="info">📞 Contact: ${contact}</div>
-                <button class="buy-btn mt-3" data-bs-toggle="modal" data-bs-target="#paymentModal">
-                  Buy Now
-                </button>
-              </div>
+      const card = `
+        <div class="col-md-3 col-sm-6">
+          <div class="product-card">
+            <img src="${img}" alt="${title}">
+            <div class="product-details">
+              <div class="product-name">${title}</div>
+              <div class="info">👤 Found by: <strong>${foundBy}</strong></div>
+              <div class="info">🎓 Reg No: ${regno}</div>
+              <div class="info">📞 Contact: ${contact}</div>
+              <button class="buy-btn mt-3" data-id="${prod._id}">
+                Buy Now
+              </button>
             </div>
           </div>
-        `;
-        container.append(card);
-      }
-
-    } catch (err) {
-      console.error("Error loading lost products:", err);
-      $("#lostProducts").html('<p class="text-center text-danger">Failed to load lost products.</p>');
+        </div>
+      `;
+      container.append(card);
     }
+
+  } catch (err) {
+    console.error("Error loading lost products:", err);
+    $("#lostProducts").html('<p class="text-center text-danger">Failed to load lost products.</p>');
   }
+}
 
-  $(document).ready(function(){
-    loadLostProducts();
+let selectedProductId = null;
 
-    // Search filter
-    $("#searchInput").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      $("#lostProducts .product-card").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-      });
+$(document).ready(function() {
+  loadLostProducts();
+
+  // Search filter
+  $("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#lostProducts .product-card").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
     });
   });
-  </script>
+
+  // Open confirm modal
+  $(document).on("click", ".buy-btn", function() {
+    selectedProductId = $(this).data("id");
+    $("#confirmBuyModal").modal("show");
+  });
+
+  // Confirm purchase
+  $("#confirmYes").click(async function() {
+    if (!selectedProductId) return;
+
+    try {
+      const response = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: selectedProductId,
+          buyerId: localStorage.getItem("userId"),
+          from: "lost"   // 🔹 key difference from buy.html
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Order failed");
+
+      alert("✅ " + data.message);
+      $("#confirmBuyModal").modal("hide");
+      window.location.href = "orders.html";
+
+    } catch (err) {
+      alert("❌ " + err.message);
+    }
+  });
+});
+</script>
+
 
 </body>
 </html>

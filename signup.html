@@ -110,18 +110,16 @@ $(document).ready(function() {
       isValid = false;
     }
 
-   let regnoPattern = /^23BCA0*(?:[1-9][0-9]{0,2}|1000)$/i;
-regno = regno.toUpperCase();
+  let regnoPattern = /^(23BCA)(0*(?:[1-9][0-9]{0,2}|1000))$/i;
 
-if (regno === "") {
-  $("#regnoError").text("Register number is required").show();
-  isValid = false;
-} else if (!regnoPattern.test(regno)) {
-  $("#regnoError").text("Enter valid Register No (e.g., 23BCA0001 - 23BCA1000)").show();
+regno = regno.trim().toUpperCase();
+if (!regnoPattern.test(regno)) {
+  $("#regnoError").text("Enter valid Register No (only 23BCA0001 - 23BCA1000, no special characters)").show();
   isValid = false;
 } else {
   $("#regnoError").hide();
 }
+
 
 
 
