@@ -9,6 +9,7 @@
       background: linear-gradient(to right, #56ccf2, #2f80ed);
       min-height: 100vh;
       font-family: 'Poppins', sans-serif;
+      padding-top: 120px;
     }
     .order-card {
       border-radius: 12px;
@@ -21,23 +22,137 @@
       color: green;
       font-weight: bold;
     }
+    .free-price {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
   </style>
 </head>
 <body class="container py-4">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
 
   <h3 class="text-center text-light fw-bold mb-4">My Orders</h3>
 
   <div id="ordersContainer"></div>
 
   <div class="text-center">
-    <a href="home.html" class="btn btn-light mt-3">Back to Home</a>
+    <a href="index.html" class="btn btn-light mt-3">Back to Home</a>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please login first to access this page');
+    window.location.href = 'login.html';
+    return;
+  }
+  updateNavbar();
+  loadOrders();
+});
+
+// Navbar functionality
+function updateNavbar() {
+  const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
+  const authButton = document.getElementById('authButton');
+  const navLinks = document.getElementById('navLinks');
+  
+  if (token) {
+    authButton.textContent = 'Sign Out';
+    authButton.className = 'btn btn-outline-danger';
+    
+    let adminLink = '';
+    if (userRole === 'admin') {
+      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+    }
+    
+    navLinks.innerHTML = `
+      ${adminLink}
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="profile.html">View Profile</a>
+      <a class="nav-link" href="orders.html">My Orders</a>
+      <a class="nav-link" href="feedback.html">Feedback</a>
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  } else {
+    authButton.textContent = 'Login';
+    authButton.className = 'btn btn-outline-primary';
+    navLinks.innerHTML = `
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  }
+}
+
+function handleAuth() {
+  const token = localStorage.getItem('token');
+  if (token) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userRole');
+    updateNavbar();
+    window.location.href = 'index.html';
+  } else {
+    window.location.href = 'login.html';
+  }
+}
+
 async function loadOrders() {
   try {
-    const buyerId = localStorage.getItem("userId"); // Get logged-in user
+    const buyerId = localStorage.getItem("userId");
     const res = await fetch(`http://localhost:5000/api/orders?buyerId=${buyerId}`);
     const orders = await res.json();
 
@@ -49,42 +164,71 @@ async function loadOrders() {
       return;
     }
 
-orders.forEach(order => {
-  const prod = order.product || {};
-  const img = prod.imageUrl || "https://via.placeholder.com/200x150?text=No+Image";
-  const card = `
-    <div class="order-card">
-      <img src="${img}" alt="${prod.title || 'Product'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
-      <h5>${prod.title || "Unnamed Product"}</h5>
-      <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
-      <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
-      <p class="ordered-text">✅ Ordered Successfully</p>
-      <button class="btn btn-danger cancel-btn" data-id="${order._id}">Cancel Order</button>
-    </div>
-  `;
-  container.append(card);
-});
+    orders.forEach(order => {
+      const prod = order.product || {};
+      const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : "https://via.placeholder.com/200x150?text=No+Image";
+      
+      // Check if product is free (price = 0)
+      const priceDisplay = prod.price === 0 ? 
+        '<span class="free-price">💰 Price: FREE</span>' : 
+        `💰 Price: ₹${prod.price}`;
+
+      const card = `
+        <div class="order-card">
+          <img src="${img}" alt="${prod.title || 'Product'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
+          <h5>${prod.title || "Unnamed Product"}</h5>
+          <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
+          <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
+          <p>${priceDisplay}</p>
+          <p class="ordered-text">✅ Ordered Successfully</p>
+          <button class="btn btn-danger cancel-btn" data-id="${order._id}">Cancel Order</button>
+        </div>
+      `;
+      container.append(card);
+    });
   } catch (err) {
     console.error(err);
     $("#ordersContainer").html('<p class="text-danger text-center">Failed to load orders.</p>');
   }
 }
 
-  $(document).on("click", ".cancel-btn", async function() {
-    const id = $(this).data("id");
-    if (!confirm("Cancel this order?")) return;
+$(document).on("click", ".cancel-btn", async function() {
+  const id = $(this).data("id");
+  if (!confirm("Cancel this order?")) return;
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/orders/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      alert(data.message);
-      loadOrders(); // reload list
-    } catch (err) {
-      alert("Error cancelling order");
+  try {
+    const res = await fetch(`http://localhost:5000/api/orders/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    alert(data.message);
+    loadOrders();
+  } catch (err) {
+    alert("Error cancelling order");
+  }
+});
+
+// Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
     }
-  });
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
 
-  $(document).ready(loadOrders);
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
   </script>
 </body>
 </html>

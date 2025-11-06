@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Products - CampusConnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      padding-top: 120px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .product-image {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .category-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+    .search-bar {
+      max-width: 400px;
+      margin: 0 auto 30px;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Manage Products</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="text-center mb-4 fw-bold">Manage Products</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="searchProducts" class="form-control" placeholder="Search products by title or category...">
+    </div>
+
+    <div id="productsContainer">
+      <!-- Products will be loaded here -->
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="admin_dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Check authentication and admin role
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      
+      if (!token || userRole !== 'admin') {
+        alert('Access denied. Admin privileges required.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      updateNavbar();
+      loadProducts();
+    });
+
+    // Navbar functionality
+    function updateNavbar() {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.innerHTML = `
+        <a class="nav-link" href="admin_dashboard.html">Dashboard</a>
+        <a class="nav-link" href="users_data.html">Users</a>
+        <a class="nav-link" href="products_data.html">Products</a>
+        <a class="nav-link" href="feedback_data.html">Feedback</a>
+        <a class="nav-link" href="admin_data.html">Admins</a>
+        <a class="nav-link" href="index.html">Home</a>
+      `;
+    }
+
+    function handleAuth() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    }
+
+    // Load all products
+    async function loadProducts() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/admin/products', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load products');
+        }
+
+        const container = $("#productsContainer");
+        container.empty();
+
+        if (!data.products.length) {
+          container.html('<p class="text-center">No products found.</p>');
+          return;
+        }
+
+        data.products.forEach(product => {
+          const img = product.imagePath ? `http://localhost:5000/${product.imagePath}` : 'https://via.placeholder.com/150x150?text=No+Image';
+          const priceDisplay = product.price === 0 ? 'FREE' : `₹${product.price}`;
+          const statusBadge = product.isSold ? 'bg-danger' : 'bg-success';
+          const statusText = product.isSold ? 'SOLD' : 'AVAILABLE';
+
+          const productCard = `
+            <div class="product-card position-relative">
+              <span class="badge ${product.category === 'sale' ? 'bg-primary' : 'bg-warning'} category-badge">
+                ${product.category.toUpperCase()}
+              </span>
+              <span class="badge ${statusBadge}" style="top: 45px; right: 15px;">
+                ${statusText}
+              </span>
+              
+              <div class="row">
+                <div class="col-md-2">
+                  <img src="${img}" alt="${product.title}" class="product-image">
+                </div>
+                <div class="col-md-6">
+                  <h5 class="fw-bold">${product.title}</h5>
+                  <p class="mb-1"><strong>Description:</strong> ${product.description || 'No description'}</p>
+                  <p class="mb-1"><strong>Price:</strong> ${priceDisplay}</p>
+                  <p class="mb-1"><strong>Seller:</strong> ${product.user?.name || 'Unknown'}</p>
+                  <p class="mb-1"><strong>Seller Email:</strong> ${product.user?.email || 'N/A'}</p>
+                  <p class="mb-0"><strong>Posted:</strong> ${new Date(product.createdAt).toLocaleDateString()}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                  <div class="btn-group-vertical w-100">
+                    <button class="btn btn-warning btn-sm mb-2" onclick="editProduct('${product._id}')">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="removeProduct('${product._id}', '${product.title}')">
+                      <i class="fas fa-trash"></i> Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          container.append(productCard);
+        });
+
+        // Add search functionality
+        $("#searchProducts").on("keyup", function() {
+          const value = $(this).val().toLowerCase();
+          $(".product-card").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+          });
+        });
+
+      } catch (err) {
+        console.error('Error loading products:', err);
+        $("#productsContainer").html('<p class="text-center text-danger">Failed to load products.</p>');
+      }
+    }
+
+    // Remove product
+    async function removeProduct(productId, productTitle) {
+      if (!confirm(`Are you sure you want to remove product "${productTitle}"?`)) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to remove product');
+        }
+
+        alert('✅ Product removed successfully!');
+        loadProducts(); // Reload the list
+
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
+      }
+    }
+
+    // Edit product - redirect to edit page
+    function editProduct(productId) {
+      window.location.href = `edit_product.html?id=${productId}`;
+    }
+
+    // Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
+  </script>
+</body>
+</html>

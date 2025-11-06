@@ -3,42 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contact Us - CampusConnect</title>
+  <title>Address - CampusConnect</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    .contact-card {
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      padding: 30px;
-      background: #fff;
-      margin-bottom: 20px;
-    }
-    .contact-card img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 15px;
-      border: 3px solid #ddd;
-    }
-    .social-icons a {
-      margin: 0 10px;
-      font-size: 22px;
-      color: #333;
-      transition: 0.3s;
-    }
-    .social-icons a:hover {
-      color: #007bff;
-    }
     body {
       padding-top: 120px;
     }
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
+    .address-card {
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      background: #fff;
+      max-width: 600px;
+      margin: 0 auto;
     }
-
+    .contact-info {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
     .message-badge {
   position: absolute;
   top: -5px;
@@ -57,9 +42,8 @@
 
   </style>
 </head>
-<body class="d-flex flex-column">
-
-  <!-- Top Navbar Row 1 -->
+<body>
+  <!-- Same two-row navbar structure -->
   <nav class="navbar navbar-light bg-light fixed-top nav-row">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
@@ -77,7 +61,6 @@
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
     <div class="container-fluid">
       <div class="navbar-nav" id="navLinks">
@@ -86,41 +69,50 @@
     </div>
   </nav>
 
-  <div class="container mt-5">
-    <h3 class="fw-bold text-center mb-4">Website Owners</h3>
-    
-    <!-- Owner 1 -->
-    <div class="contact-card text-center">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Owner Photo">
-      <h5 class="fw-bold">S. Karthick</h5>
-      <p>📞 +91 7200308286</p>
-      <div class="social-icons">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
+  <div class="container">
+    <div class="address-card">
+      <h2 class="text-center mb-4">Our Office</h2>
+      
+      <div class="text-center mb-4">
+        <i class="fas fa-building fa-3x text-primary mb-3"></i>
+        <h4>CampusConnect Headquarters</h4>
+      </div>
+
+      <div class="contact-info">
+        <h5>📍 Address</h5>
+        <p class="mb-3">
+          Vellore Institute of Technology<br>
+          Student Center Building, 2nd Floor<br>
+          Katpadi, Vellore - 632014<br>
+          Tamil Nadu, India
+        </p>
+
+        <h5>📞 Contact Information</h5>
+        <p class="mb-2">
+          <strong>Phone:</strong> +91 9876543210<br>
+          <strong>Email:</strong> office@campusconnect.edu.in<br>
+          <strong>Hours:</strong> Mon-Fri, 9:00 AM - 5:00 PM
+        </p>
+      </div>
+
+      <div class="mt-4">
+        <h5>🚗 How to Reach Us</h5>
+        <p class="mb-0">
+          Located in the main Student Center building near the library. 
+          Look for the CampusConnect signage on the second floor.
+        </p>
       </div>
     </div>
 
-    <!-- Owner 2 -->
-    <div class="contact-card text-center">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Partner Photo">
-      <h5 class="fw-bold">S. Dinesh</h5>
-      <p>📞 +91 6383157534</p>
-      <div class="social-icons">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
-      </div>
-    </div>
-
-    <div class="text-center">
-      <a href="index.html" class="btn btn-primary mt-3">Back to Home</a>
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-primary">Back to Home</a>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-// Update navbar
+    // Same navbar functionality
+// Navbar functionality
 function updateNavbar() {
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('userRole');
@@ -157,21 +149,20 @@ function updateNavbar() {
   }
 }
 
-function handleAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    updateNavbar();
-    window.location.href = 'index.html';
-  } else {
-    window.location.href = 'login.html';
-  }
-}
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
 
-// Load message count for navbar
+    // Load message count for navbar
 async function loadMessageCount() {
   try {
     const token = localStorage.getItem('token');
@@ -195,7 +186,7 @@ function viewMessages() {
   window.location.href = 'messages.html';
 }
 
-document.addEventListener('DOMContentLoaded', updateNavbar);
+    document.addEventListener('DOMContentLoaded', updateNavbar);
   </script>
 </body>
 </html>

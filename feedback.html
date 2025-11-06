@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feedback - CampusConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      padding-top: 120px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .feedback-option-card {
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      padding: 30px;
+      text-align: center;
+      background: #fff;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+    }
+    .feedback-option-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+    .feedback-option-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container d-flex justify-content-center align-items-center flex-grow-1">
+    <div class="row g-5 text-center">
+      
+      <!-- Provide Feedback Card -->
+      <div class="col-md-6">
+        <div class="feedback-option-card">
+          <img src="provide_feedback.jpg" alt="Provide Feedback" id="provideFeedbackImg">
+          <h3 class="fw-bold mb-3">Provide Feedback</h3>
+          <p class="text-muted mb-4">Share your experience with the products you've received</p>
+          <button class="btn btn-primary btn-lg" onclick="goToProvideFeedback()">Provide Feedback</button>
+        </div>
+      </div>
+
+      <!-- View Feedback Card -->
+      <div class="col-md-6">
+        <div class="feedback-option-card">
+          <img src="view_feedback.jpg" alt="View Feedback" id="viewFeedbackImg">
+          <h3 class="fw-bold mb-3">View Feedback of Students</h3>
+          <p class="text-muted mb-4">See what other students are saying about their purchases</p>
+          <button class="btn btn-success btn-lg" onclick="goToViewFeedback()">View Feedback</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="index.html" class="btn btn-outline-primary">Back to Home</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Check authentication and update navbar
+    document.addEventListener('DOMContentLoaded', function() {
+      updateNavbar();
+      
+      // Set placeholder images if actual images are not available
+      document.getElementById('provideFeedbackImg').onerror = function() {
+        this.src = 'https://cdn-icons-png.flaticon.com/512/3991/3991971.png';
+      };
+      document.getElementById('viewFeedbackImg').onerror = function() {
+        this.src = 'https://cdn-icons-png.flaticon.com/512/3594/3594350.png';
+      };
+    });
+
+    // Navbar functionality
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function goToProvideFeedback() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please sign up to provide feedback');
+        window.location.href = 'login.html';
+        return;
+      }
+      window.location.href = 'provide_feedback.html';
+    }
+
+    function goToViewFeedback() {
+      window.location.href = 'view_feedback.html';
+    }
+
+    // Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
+  </script>
+</body>
+</html>

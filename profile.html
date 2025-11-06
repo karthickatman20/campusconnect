@@ -4,13 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Profile - CampusConnect</title>
-
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
   <style>
-    /* Body & background */
     body {
       min-height: 100vh;
       margin: 0;
@@ -21,6 +17,7 @@
       background-size: 300% 300%;
       animation: gradientShift 10s ease infinite;
       font-family: 'Poppins', sans-serif;
+      padding-top: 120px;
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -28,7 +25,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Profile card */
     .profile-card {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(15px);
@@ -47,7 +43,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Profile image */
     .profile-card img {
       width: 130px;
       height: 130px;
@@ -62,7 +57,6 @@
       transform: scale(1.05);
     }
 
-    /* Headings & info */
     .profile-card h3 {
       font-weight: 700;
       font-size: 1.8rem;
@@ -96,7 +90,6 @@
       color: #fff;
     }
 
-    /* Buttons */
     .btn-glow {
       background: #48bfe3;
       border: none;
@@ -112,10 +105,56 @@
       background: #5e60ce;
       box-shadow: 0 0 20px #5e60ce, 0 0 30px #5e60ce;
     }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
   </style>
 </head>
-
 <body>
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
 
   <div class="profile-card" id="profileCard">
     <img id="userImg" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Profile Picture">
@@ -127,44 +166,127 @@
       <p><i class="bi bi-telephone-fill"></i> <span id="userPhone">Fetching...</span></p>
       <p><i class="bi bi-building"></i> <span id="userAddress">Fetching...</span></p>
       <p><i class="bi bi-card-text"></i> Reg No: <span id="userReg">Fetching...</span></p>
+      <p><i class="bi bi-person-badge"></i> Role: <span id="userRole">Fetching...</span></p>
     </div>
 
-    <a href="home.html" class="btn btn-glow mt-3"><i class="bi bi-house-door"></i> Back to Home</a>
+    <a href="index.html" class="btn btn-glow mt-3"><i class="bi bi-house-door"></i> Back to Home</a>
   </div>
 
   <script>
-    // Get userId from localStorage
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please login first to access this page');
+    window.location.href = 'login.html';
+    return;
+  }
+  updateNavbar();
+  loadUserProfile();
+});
 
-    if (!userId || !token) {
-      alert("You must log in first!");
-      window.location.href = "login.html";
-    } else {
-      async function loadUserProfile() {
-        try {
-          const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
-          if (!res.ok) throw new Error("User not found");
-
-          const user = await res.json();
-
-          document.getElementById("userName").textContent = user.name;
-          document.getElementById("userEmail").textContent = user.email;
-          document.getElementById("userPhone").textContent = user.phone;
-          document.getElementById("userAddress").textContent = user.address;
-          document.getElementById("userReg").textContent = user.regno;
-        } catch (err) {
-          document.getElementById("profileCard").innerHTML = `
-            <h3 class="text-danger">Failed to load profile</h3>
-            <p>${err.message}</p>
-          `;
-          console.error(err);
-        }
-      }
-      document.addEventListener("DOMContentLoaded", loadUserProfile);
+// Navbar functionality
+function updateNavbar() {
+  const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
+  const authButton = document.getElementById('authButton');
+  const navLinks = document.getElementById('navLinks');
+  
+  if (token) {
+    authButton.textContent = 'Sign Out';
+    authButton.className = 'btn btn-outline-danger';
+    
+    let adminLink = '';
+    if (userRole === 'admin') {
+      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
     }
+    
+    navLinks.innerHTML = `
+      ${adminLink}
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="profile.html">View Profile</a>
+      <a class="nav-link" href="orders.html">My Orders</a>
+      <a class="nav-link" href="feedback.html">Feedback</a>
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  } else {
+    authButton.textContent = 'Login';
+    authButton.className = 'btn btn-outline-primary';
+    navLinks.innerHTML = `
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  }
+}
+
+function handleAuth() {
+  const token = localStorage.getItem('token');
+  if (token) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userRole');
+    updateNavbar();
+    window.location.href = 'index.html';
+  } else {
+    window.location.href = 'login.html';
+  }
+}
+
+// Get userId from localStorage
+const userId = localStorage.getItem("userId");
+const token = localStorage.getItem("token");
+
+async function loadUserProfile() {
+  try {
+    const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("User not found");
+
+    const user = await res.json();
+
+    document.getElementById("userName").textContent = user.name;
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("userPhone").textContent = user.phone;
+    document.getElementById("userAddress").textContent = user.address;
+    document.getElementById("userReg").textContent = user.regno;
+    document.getElementById("userRole").textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+  } catch (err) {
+    document.getElementById("profileCard").innerHTML = `
+      <h3 class="text-danger">Failed to load profile</h3>
+      <p>${err.message}</p>
+    `;
+    console.error(err);
+  }
+}
+
+// Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
   </script>
 </body>
 </html>

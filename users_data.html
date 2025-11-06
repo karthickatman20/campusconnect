@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Users - CampusConnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      padding-top: 120px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .user-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+    .user-card:hover {
+      transform: translateY(-5px);
+    }
+    .user-role-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+    .search-bar {
+      max-width: 400px;
+      margin: 0 auto 30px;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Manage Users</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="text-center mb-4 fw-bold">Manage Users</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="searchUsers" class="form-control" placeholder="Search users by name, email, or regno...">
+    </div>
+
+    <div id="usersContainer">
+      <!-- Users will be loaded here -->
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="admin_dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Check authentication and admin role
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      
+      if (!token || userRole !== 'admin') {
+        alert('Access denied. Admin privileges required.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      updateNavbar();
+      loadUsers();
+    });
+
+    // Navbar functionality
+    function updateNavbar() {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.innerHTML = `
+        <a class="nav-link" href="admin_dashboard.html">Dashboard</a>
+        <a class="nav-link" href="users_data.html">Users</a>
+        <a class="nav-link" href="products_data.html">Products</a>
+        <a class="nav-link" href="feedback_data.html">Feedback</a>
+        <a class="nav-link" href="admin_data.html">Admins</a>
+        <a class="nav-link" href="index.html">Home</a>
+      `;
+    }
+
+    function handleAuth() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    }
+
+    // Load all users
+    async function loadUsers() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/admin/users', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load users');
+        }
+
+        const container = $("#usersContainer");
+        container.empty();
+
+        if (!data.users.length) {
+          container.html('<p class="text-center">No users found.</p>');
+          return;
+        }
+
+        data.users.forEach(user => {
+          const userCard = `
+            <div class="user-card position-relative">
+              <span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'} user-role-badge">
+                ${user.role.toUpperCase()}
+              </span>
+              
+              <div class="row">
+                <div class="col-md-8">
+                  <h5 class="fw-bold">${user.name}</h5>
+                  <p class="mb-1"><strong>Email:</strong> ${user.email}</p>
+                  <p class="mb-1"><strong>Reg No:</strong> ${user.regno}</p>
+                  <p class="mb-1"><strong>Phone:</strong> ${user.phone}</p>
+                  <p class="mb-1"><strong>Address:</strong> ${user.address}</p>
+                  <p class="mb-0"><strong>Joined:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                  <div class="btn-group-vertical w-100">
+                    <button class="btn btn-warning btn-sm mb-2" onclick="editUser('${user._id}')">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="removeUser('${user._id}', '${user.name}')">
+                      <i class="fas fa-trash"></i> Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          container.append(userCard);
+        });
+
+        // Add search functionality
+        $("#searchUsers").on("keyup", function() {
+          const value = $(this).val().toLowerCase();
+          $(".user-card").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+          });
+        });
+
+      } catch (err) {
+        console.error('Error loading users:', err);
+        $("#usersContainer").html('<p class="text-center text-danger">Failed to load users.</p>');
+      }
+    }
+
+    // Remove user
+    async function removeUser(userId, userName) {
+      if (!confirm(`Are you sure you want to remove user "${userName}"?`)) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to remove user');
+        }
+
+        alert('✅ User removed successfully!');
+        loadUsers(); // Reload the list
+
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
+      }
+    }
+
+    // Edit user - redirect to edit page
+    function editUser(userId) {
+      window.location.href = `edit_user.html?id=${userId}`;
+    }
+
+    // Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
+  </script>
+</body>
+</html>

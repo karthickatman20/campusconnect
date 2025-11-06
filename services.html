@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Services - CampusConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
+  <style>
+    body {
+      padding-top: 120px;
+    }
+    .service-card {
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-bottom: 20px;
+      background: #fff;
+    }
+    .step-number {
+      background: #007bff;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  </style>
+</head>
+<body>
+  <!-- Same two-row navbar structure as index.html -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="text-center mb-4">Our Services</h2>
+    
+    <div class="service-card">
+      <h4>🛒 Campus Marketplace</h4>
+      <p>Buy and sell items within your campus community safely and conveniently.</p>
+      <ul>
+        <li>Textbooks, notes, and study materials</li>
+        <li>Electronics and gadgets</li>
+        <li>Sports equipment and accessories</li>
+        <li>Room essentials and furniture</li>
+      </ul>
+    </div>
+
+    <div class="service-card">
+      <h4>🔍 Lost & Found</h4>
+      <p>Find your lost items or help others find theirs through our dedicated platform.</p>
+      <ul>
+        <li>Report lost items with descriptions</li>
+        <li>Browse found items by other students</li>
+        <li>Secure claiming process</li>
+        <li>Campus-wide visibility</li>
+      </ul>
+    </div>
+
+    <div class="service-card">
+      <h4>📋 How It Works</h4>
+      
+      <div class="d-flex align-items-center mb-3">
+        <div class="step-number">1</div>
+        <div>
+          <h5>Create Your Account</h5>
+          <p class="mb-0">Register with your VIT email address and verify your identity</p>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center mb-3">
+        <div class="step-number">2</div>
+        <div>
+          <h5>Buy/Sell Items</h5>
+          <p class="mb-0">Browse products or list your own items with photos and descriptions</p>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center mb-3">
+        <div class="step-number">3</div>
+        <div>
+          <h5>Lost & Found</h5>
+          <p class="mb-0">Report lost items or browse found items to claim what's yours</p>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center">
+        <div class="step-number">4</div>
+        <div>
+          <h5>Connect & Exchange</h5>
+          <p class="mb-0">Contact sellers/finders and arrange safe exchanges on campus</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-primary">Back to Home</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Same navbar functionality as index.html
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
+
+    document.addEventListener('DOMContentLoaded', updateNavbar);
+  </script>
+</body>
+</html>

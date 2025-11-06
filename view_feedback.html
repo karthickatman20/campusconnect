@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>View Feedback - CampusConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      padding-top: 120px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .feedback-display-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: flex-start;
+      transition: transform 0.3s ease;
+    }
+    .feedback-display-card:hover {
+      transform: translateY(-5px);
+    }
+    .feedback-image {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-right: 25px;
+      flex-shrink: 0;
+    }
+    .feedback-content {
+      flex-grow: 1;
+    }
+    .user-name {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      text-align: right;
+    }
+    .feedback-text {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .star-rating-display {
+      color: #ffc107;
+      font-size: 20px;
+    }
+    .feedback-date {
+      color: #888;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .pagination .page-link {
+      color: #007bff;
+    }
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .no-feedback {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="text-center mb-4 fw-bold">Student Feedback</h2>
+    
+    <div id="feedbacksContainer">
+      <!-- Feedback cards will be loaded here -->
+    </div>
+    
+    <!-- Pagination -->
+    <nav aria-label="Feedback pagination" class="mt-4">
+      <ul class="pagination justify-content-center" id="pagination">
+        <!-- Pagination links will be generated here -->
+      </ul>
+    </nav>
+
+    <div class="text-center mt-4">
+      <a href="feedback.html" class="btn btn-outline-primary">Back to Feedback</a>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let currentPage = 1;
+
+    // Check authentication and update navbar
+    document.addEventListener('DOMContentLoaded', function() {
+      updateNavbar();
+      loadFeedbacks();
+    });
+
+    // Navbar functionality
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Load feedbacks with pagination
+    async function loadFeedbacks(page = 1) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/feedback?page=${page}`);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Failed to load feedbacks");
+
+        const container = $("#feedbacksContainer");
+        container.empty();
+
+        if (!data.feedbacks.length) {
+          container.html(`
+            <div class="no-feedback">
+              <i class="fas fa-comment-slash fa-3x mb-3 text-muted"></i>
+              <h4>No Feedback Yet</h4>
+              <p>Be the first to share your experience!</p>
+            </div>
+          `);
+          $("#pagination").empty();
+          return;
+        }
+
+        // Display feedbacks
+        data.feedbacks.forEach(feedback => {
+          const card = `
+            <div class="feedback-display-card">
+              <img src="http://localhost:5000/${feedback.imagePath}" alt="Product" class="feedback-image">
+              <div class="feedback-content">
+                <div class="user-name">
+                  ${feedback.user.name}
+                  <div class="feedback-date">
+                    ${new Date(feedback.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+                <div class="feedback-text">
+                  ${feedback.feedbackText}
+                </div>
+                <div class="star-rating-display">
+                  ${'★'.repeat(feedback.rating)}${'☆'.repeat(5 - feedback.rating)}
+                  <span class="ms-2 text-muted">(${feedback.rating}/5)</span>
+                </div>
+              </div>
+            </div>
+          `;
+          container.append(card);
+        });
+
+        // Generate pagination
+        generatePagination(data.currentPage, data.totalPages);
+        currentPage = page;
+
+      } catch (err) {
+        console.error("Error loading feedbacks:", err);
+        $("#feedbacksContainer").html(`
+          <div class="no-feedback">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-danger"></i>
+            <h4>Failed to Load Feedbacks</h4>
+            <p>Please try again later</p>
+          </div>
+        `);
+      }
+    }
+
+    // Generate pagination links
+    function generatePagination(currentPage, totalPages) {
+      const pagination = $("#pagination");
+      pagination.empty();
+
+      if (totalPages <= 1) return;
+
+      // Previous button
+      if (currentPage > 1) {
+        pagination.append(`
+          <li class="page-item">
+            <a class="page-link" href="#" onclick="loadFeedbacks(${currentPage - 1})">Previous</a>
+          </li>
+        `);
+      }
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const li = `<li class="page-item ${i === currentPage ? 'active' : ''}">
+          <a class="page-link" href="#" onclick="loadFeedbacks(${i})">${i}</a>
+        </li>`;
+        pagination.append(li);
+      }
+
+      // Next button
+      if (currentPage < totalPages) {
+        pagination.append(`
+          <li class="page-item">
+            <a class="page-link" href="#" onclick="loadFeedbacks(${currentPage + 1})">Next</a>
+          </li>
+        `);
+      }
+    }
+
+    // Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
+  </script>
+</body>
+</html>

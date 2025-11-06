@@ -9,7 +9,7 @@
     body {
       background: linear-gradient(to right, #6dd5ed, #2193b0);
       min-height: 100vh;
-      padding-top: 80px;
+      padding-top: 120px;
       font-family: 'Poppins', sans-serif;
     }
     .product-card {
@@ -61,40 +61,58 @@
       margin: 20px auto;
       max-width: 600px;
     }
-    /* Modal Styles */
     .modal-content {
       border-radius: 12px;
     }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+    .message-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
   </style>
 </head>
 <body class="d-flex flex-column">
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-light bg-light shadow-sm fixed-top">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-      <button class="btn btn-outline-secondary me-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        ☰
-      </button>
-      <span class="navbar-brand mb-0 h1 fw-bold position-absolute start-50 translate-middle-x">
-        CampusConnect
-      </span>
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
+      <div class="d-flex">
+        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+    <i class="fas fa-bell"></i>
+    <span class="message-badge" id="messageCount">0</span>
+  </button>
+</div>
+
+
+        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      </div>
     </div>
   </nav>
 
-  <!-- Sidebar -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title">Menu</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  <!-- Top Navbar Row 2 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
+    <div class="container-fluid">
+      <div class="navbar-nav" id="navLinks">
+        <!-- Dynamic links -->
+      </div>
     </div>
-    <div class="offcanvas-body">
-      <ul class="list-unstyled">
-        <li><a href="home.html" class="btn btn-outline-primary w-100 mb-2">Home</a></li>
-        <li><a href="contact.html" class="btn btn-outline-success w-100 mb-2">Contact Us</a></li>
-        <li><a href="login.html" class="btn btn-outline-danger w-100">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
+  </nav>
 
   <!-- Search Bar + Cards -->
   <div class="container">
@@ -107,7 +125,7 @@
     </div>
 
     <div class="text-center mt-3">
-      <a href="home.html" class="btn btn-primary">Back to Home</a>
+      <a href="index.html" class="btn btn-primary">Back to Home</a>
     </div>
   </div>
 
@@ -124,10 +142,72 @@
   </div>
 </div>
 
-
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please login first to access this page');
+    window.location.href = 'login.html';
+    return;
+  }
+  updateNavbar();
+  loadLostProducts();
+});
+
+// Navbar functionality
+function updateNavbar() {
+  const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
+  const authButton = document.getElementById('authButton');
+  const navLinks = document.getElementById('navLinks');
+  
+  if (token) {
+    authButton.textContent = 'Sign Out';
+    authButton.className = 'btn btn-outline-danger';
+    
+    let adminLink = '';
+    if (userRole === 'admin') {
+      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+    }
+    
+    navLinks.innerHTML = `
+      ${adminLink}
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="profile.html">View Profile</a>
+      <a class="nav-link" href="orders.html">My Orders</a>
+      <a class="nav-link" href="feedback.html">Feedback</a>
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  } else {
+    authButton.textContent = 'Login';
+    authButton.className = 'btn btn-outline-primary';
+    navLinks.innerHTML = `
+      <a class="nav-link" href="contact.html">Contact Us</a>
+      <a class="nav-link" href="services.html">Services</a>
+      <a class="nav-link" href="address.html">Address</a>
+    `;
+  }
+}
+
+function handleAuth() {
+  const token = localStorage.getItem('token');
+  if (token) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userRole');
+    updateNavbar();
+    window.location.href = 'index.html';
+  } else {
+    window.location.href = 'login.html';
+  }
+}
+
 const placeholder = "https://dummyimage.com/300x220/ccc/000&text=No+Image";
 
 async function loadLostProducts() {
@@ -148,7 +228,7 @@ async function loadLostProducts() {
     }
 
     for (const prod of products) {
-      const img = prod.imageUrl || placeholder;
+      const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : placeholder;
       const title = prod.title || "Unnamed Item";
       const foundBy = prod.user?.name || "Unknown";
       const regno = prod.user?.regno || "N/A";
@@ -181,52 +261,70 @@ async function loadLostProducts() {
 
 let selectedProductId = null;
 
-$(document).ready(function() {
-  loadLostProducts();
-
-  // Search filter
-  $("#searchInput").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#lostProducts .product-card").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-    });
-  });
-
-  // Open confirm modal
-  $(document).on("click", ".buy-btn", function() {
-    selectedProductId = $(this).data("id");
-    $("#confirmBuyModal").modal("show");
-  });
-
-  // Confirm purchase
-  $("#confirmYes").click(async function() {
-    if (!selectedProductId) return;
-
-    try {
-      const response = await fetch("http://localhost:5000/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: selectedProductId,
-          buyerId: localStorage.getItem("userId"),
-          from: "lost"   // 🔹 key difference from buy.html
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Order failed");
-
-      alert("✅ " + data.message);
-      $("#confirmBuyModal").modal("hide");
-      window.location.href = "orders.html";
-
-    } catch (err) {
-      alert("❌ " + err.message);
-    }
+// Search filter
+$("#searchInput").on("keyup", function() {
+  var value = $(this).val().toLowerCase();
+  $("#lostProducts .product-card").filter(function() {
+    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
   });
 });
+
+// Open confirm modal
+$(document).on("click", ".buy-btn", function() {
+  selectedProductId = $(this).data("id");
+  $("#confirmBuyModal").modal("show");
+});
+
+// Confirm purchase
+$("#confirmYes").click(async function() {
+  if (!selectedProductId) return;
+
+  try {
+    const response = await fetch("http://localhost:5000/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: selectedProductId,
+        buyerId: localStorage.getItem("userId"),
+        from: "lost"
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Order failed");
+
+    alert("✅ " + data.message);
+    $("#confirmBuyModal").modal("hide");
+    window.location.href = "orders.html";
+
+  } catch (err) {
+    alert("❌ " + err.message);
+  }
+});
+
+// Load message count for navbar
+async function loadMessageCount() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('messageCount').textContent = data.count;
+    }
+  } catch (err) {
+    console.error('Error loading message count:', err);
+  }
+}
+
+// View messages function
+function viewMessages() {
+  window.location.href = 'messages.html';
+}
 </script>
-
-
 </body>
 </html>
