@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Edit User - CampusConnect Admin</title>
+  <title>Edit Admin - CampusConnect Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
@@ -38,7 +38,7 @@
   <!-- Top Navbar Row 1 -->
   <nav class="navbar navbar-light bg-light fixed-top nav-row">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Edit User</span>
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Edit Admin</span>
       <div class="d-flex">
         <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
       </div>
@@ -67,9 +67,9 @@
 
   <div class="container">
     <div class="edit-card">
-      <h2 class="text-center mb-4">Edit User</h2>
+      <h2 class="text-center mb-4">Edit Admin</h2>
       
-      <form id="editUserForm">
+      <form id="editAdminForm">
         <div class="mb-3">
           <label class="form-label fw-bold">Full Name</label>
           <input type="text" class="form-control" id="name" required>
@@ -100,17 +100,9 @@
           <div class="error-message" id="phoneError">Phone number must be exactly 10 digits</div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold">Role</label>
-          <select class="form-control" id="role">
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <button type="button" class="btn btn-secondary me-md-2" onclick="cancelEdit()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Update User</button>
+          <button type="submit" class="btn btn-primary">Update Admin</button>
         </div>
       </form>
     </div>
@@ -148,7 +140,7 @@
       modal.show();
     }
 
-    let userId = new URLSearchParams(window.location.search).get('id');
+    let adminId = new URLSearchParams(window.location.search).get('id');
 
     // Check authentication and admin role
     document.addEventListener('DOMContentLoaded', function() {
@@ -160,12 +152,12 @@
         return;
       }
       
-      if (!userId) {
-        showFeedback('User ID not provided', 'error', true, 'users_data.html');
+      if (!adminId) {
+        showFeedback('Admin ID not provided', 'error', true, 'admin_data.html');
         return;
       }
       
-      loadUserData();
+      loadAdminData();
       setupFormValidation();
     });
 
@@ -245,11 +237,11 @@
       return isNameValid && isRegnoValid && isEmailValid && isPhoneValid && isAddressValid;
     }
 
-    // Load user data
-    async function loadUserData() {
+    // Load admin data
+    async function loadAdminData() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/admins/${adminId}`, {
           headers: {
             'Authorization': 'Bearer ' + token
           }
@@ -258,25 +250,24 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to load user data');
+          throw new Error(data.error || 'Failed to load admin data');
         }
 
-        // Fill form with user data
-        document.getElementById('name').value = data.user.name;
-        document.getElementById('regno').value = data.user.regno;
-        document.getElementById('email').value = data.user.email;
-        document.getElementById('address').value = data.user.address;
-        document.getElementById('phone').value = data.user.phone;
-        document.getElementById('role').value = data.user.role;
+        // Fill form with admin data
+        document.getElementById('name').value = data.admin.name;
+        document.getElementById('regno').value = data.admin.regno;
+        document.getElementById('email').value = data.admin.email;
+        document.getElementById('address').value = data.admin.address;
+        document.getElementById('phone').value = data.admin.phone;
 
       } catch (err) {
-        showFeedback('Error loading user data: ' + err.message, 'error');
-        window.location.href = 'users_data.html';
+        showFeedback('Error loading admin data: ' + err.message, 'error');
+        window.location.href = 'admin_data.html';
       }
     }
 
-    // Update user
-    $("#editUserForm").on("submit", async function(e) {
+    // Update admin
+    $("#editAdminForm").on("submit", async function(e) {
       e.preventDefault();
 
       if (!validateForm()) {
@@ -284,35 +275,34 @@
         return;
       }
 
-      const userData = {
+      const adminData = {
         name: $("#name").val().trim(),
         regno: $("#regno").val().trim().toUpperCase(),
         email: $("#email").val().trim(),
         address: $("#address").val().trim(),
-        phone: $("#phone").val().trim(),
-        role: $("#role").val()
+        phone: $("#phone").val().trim()
       };
 
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/admins/${adminId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
           },
-          body: JSON.stringify(userData)
+          body: JSON.stringify(adminData)
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to update user');
+          throw new Error(data.error || 'Failed to update admin');
         }
 
-        showFeedback('User updated successfully!', 'success');
+        showFeedback('Admin updated successfully!', 'success');
         setTimeout(() => {
-          window.location.href = 'users_data.html';
+          window.location.href = 'admin_data.html';
         }, 1500);
 
       } catch (err) {
@@ -321,7 +311,7 @@
     });
 
     function cancelEdit() {
-      window.location.href = 'users_data.html';
+      window.location.href = 'admin_data.html';
     }
   </script>
 </body>

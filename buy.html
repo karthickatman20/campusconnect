@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Buy - CampusConnect</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
   <style>
     body {
       background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
@@ -69,23 +71,20 @@
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
-
     .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="d-flex flex-column">
@@ -96,13 +95,11 @@
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
       <div class="d-flex">
         <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
-
-
+          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+            <i class="fas fa-bell"></i>
+            <span class="message-badge" id="messageCount">0</span>
+          </button>
+        </div>
         <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
@@ -116,6 +113,26 @@
       </div>
     </div>
   </nav>
+
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Products Section -->
   <div class="container">
@@ -150,185 +167,218 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-// Check authentication on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Please login first to access this page');
-    window.location.href = 'login.html';
-    return;
-  }
-  updateNavbar();
-  loadProducts();
-});
-
-const placeholder = "https://via.placeholder.com/300x220?text=No+Image";
-let selectedProductId = null;
-
-async function loadProducts() {
-  try {
-    const res = await fetch("http://localhost:5000/api/products/sale", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
-
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-    const products = await res.json();
-    const container = $("#productContainer");
-    container.empty();
-
-    if (!products.length) {
-      container.html('<p class="text-center">No products available at the moment.</p>');
-      return;
+    // Custom feedback function
+    function showFeedback(message, type = 'info', autoRedirect = null, redirectUrl = null) {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+      
+      if (autoRedirect && redirectUrl) {
+        setTimeout(() => {
+          modal.hide();
+          window.location.href = redirectUrl;
+        }, 2000);
+      }
     }
 
-    products.forEach(prod => {
-      const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : placeholder;
-      const title = prod.title || "Unnamed Product";
-      const seller = prod.user?.name || "Unknown";
-      const contact = prod.user?.phone || "N/A";
-      const price = prod.price ? `₹${prod.price}` : "Free";
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showFeedback('Please login first to access this page', 'warning', true, 'login.html');
+        return;
+      }
+      updateNavbar();
+      loadProducts();
+    });
 
-      const card = `
-        <div class="col-md-3 col-sm-6">
-          <div class="product-card">
-            <img src="${img}" alt="${title}">
-            <div class="product-details">
-              <div class="product-name">${title}</div>
-              <div class="info">👤 Seller: <strong>${seller}</strong></div>
-              <div class="info">📞 Contact: ${contact}</div>
-              <div class="info">💰 Price: <strong>${price}</strong></div>
-              <button class="buy-btn mt-3" data-id="${prod._id}">
-                Buy Now
-              </button>
+    const placeholder = "https://via.placeholder.com/300x220?text=No+Image";
+    let selectedProductId = null;
+
+    async function loadProducts() {
+      try {
+        const res = await fetch("http://localhost:5000/api/products/sale", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        const products = await res.json();
+        const container = $("#productContainer");
+        container.empty();
+
+        if (!products.length) {
+          container.html('<p class="text-center">No products available at the moment.</p>');
+          return;
+        }
+
+        products.forEach(prod => {
+          const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : placeholder;
+          const title = prod.title || "Unnamed Product";
+          const seller = prod.user?.name || "Unknown";
+          const contact = prod.user?.phone || "N/A";
+          const price = prod.price ? `₹${prod.price}` : "Free";
+
+          const card = `
+            <div class="col-md-3 col-sm-6">
+              <div class="product-card">
+                <img src="${img}" alt="${title}">
+                <div class="product-details">
+                  <div class="product-name">${title}</div>
+                  <div class="info">👤 Seller: <strong>${seller}</strong></div>
+                  <div class="info">📞 Contact: ${contact}</div>
+                  <div class="info">💰 Price: <strong>${price}</strong></div>
+                  <button class="buy-btn mt-3" data-id="${prod._id}">
+                    Buy Now
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      `;
-      container.append(card);
-    });
+          `;
+          container.append(card);
+        });
 
-  } catch (err) {
-    console.error("Error loading products:", err);
-    $("#productContainer").html('<p class="text-center text-danger">Failed to load products.</p>');
-  }
-}
-
-// Navbar functionality
-function updateNavbar() {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  const authButton = document.getElementById('authButton');
-  const navLinks = document.getElementById('navLinks');
-  
-  if (token) {
-    authButton.textContent = 'Sign Out';
-    authButton.className = 'btn btn-outline-danger';
-    
-    let adminLink = '';
-    if (userRole === 'admin') {
-      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+      } catch (err) {
+        console.error("Error loading products:", err);
+        $("#productContainer").html('<p class="text-center text-danger">Failed to load products.</p>');
+      }
     }
-    
-    navLinks.innerHTML = `
-      ${adminLink}
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="profile.html">View Profile</a>
-      <a class="nav-link" href="orders.html">My Orders</a>
-      <a class="nav-link" href="feedback.html">Feedback</a>
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  } else {
-    authButton.textContent = 'Login';
-    authButton.className = 'btn btn-outline-primary';
-    navLinks.innerHTML = `
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  }
-}
 
-function handleAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    updateNavbar();
-    window.location.href = 'index.html';
-  } else {
-    window.location.href = 'login.html';
-  }
-}
+    // Navbar functionality
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
 
-// Search filter
-$("#searchInput").on("keyup", function() {
-  const value = $(this).val().toLowerCase();
-  $("#productContainer .product-card").filter(function() {
-    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-  });
-});
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
 
-// Buy functionality
-$(document).on("click", ".buy-btn", function() {
-  selectedProductId = $(this).data("id");
-  $("#confirmBuyModal").modal("show");
-});
-
-$("#confirmYes").click(async function() {
-  if (!selectedProductId) return;
-
-  try {
-    const response = await fetch("http://localhost:5000/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: selectedProductId,
-        buyerId: localStorage.getItem("userId"),
-        from: "buy"
-      })
+    // Search filter
+    $("#searchInput").on("keyup", function() {
+      const value = $(this).val().toLowerCase();
+      $("#productContainer .product-card").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
     });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Order failed");
+    // Buy functionality
+    $(document).on("click", ".buy-btn", function() {
+      selectedProductId = $(this).data("id");
+      $("#confirmBuyModal").modal("show");
+    });
 
-    alert("✅ " + data.message);
-    $("#confirmBuyModal").modal("hide");
-    window.location.href = "orders.html";
+    $("#confirmYes").click(async function() {
+      if (!selectedProductId) return;
 
-  } catch (err) {
-    alert("❌ " + err.message);
-  }
-});
+      try {
+        const response = await fetch("http://localhost:5000/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: selectedProductId,
+            buyerId: localStorage.getItem("userId"),
+            from: "buy"
+          })
+        });
 
-// Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Order failed");
+
+        showFeedback("Product ordered successfully!", "success", true, "orders.html");
+        $("#confirmBuyModal").modal("hide");
+
+      } catch (err) {
+        showFeedback(err.message, "error");
       }
     });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
-    }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
 
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
-</script>
+    // Load message count for navbar
+    async function loadMessageCount() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('messageCount').textContent = data.count;
+        }
+      } catch (err) {
+        console.error('Error loading message count:', err);
+      }
+    }
+
+    function viewMessages() {
+      window.location.href = 'messages.html';
+    }
+  </script>
 </body>
 </html>

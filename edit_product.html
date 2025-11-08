@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit Product - CampusConnect Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
+      min-height: 100vh;
+      padding-top: 120px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .edit-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      padding: 30px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .nav-row {
+      border-bottom: 1px solid #dee2e6;
+    }
+    .other-type-input {
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column">
+
+  <!-- Top Navbar Row 1 -->
+  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Edit Product</span>
+      <div class="d-flex">
+        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="edit-card">
+      <h2 class="text-center mb-4">Edit Product</h2>
+      
+      <form id="editProductForm">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Product Title</label>
+          <input type="text" class="form-control" id="title" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Product Type</label>
+          <select class="form-control" id="productType" required>
+            <option value="" selected disabled>Choose</option>
+            <option value="Books">Books</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Others">Others</option>
+          </select>
+          <!-- Other Type Input (shown only when Others is selected) -->
+          <input type="text" id="otherProductType" class="form-control other-type-input" placeholder="Enter product type">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Description</label>
+          <textarea class="form-control" id="description" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Price (₹)</label>
+          <input type="number" class="form-control" id="price" min="0" step="0.01" required>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="button" class="btn btn-secondary me-md-2" onclick="cancelEdit()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Custom feedback function
+    function showFeedback(message, type = 'info') {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+    }
+
+    let productId = new URLSearchParams(window.location.search).get('id');
+
+    // Check authentication and admin role
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      
+      if (!token || userRole !== 'admin') {
+        showFeedback('Access denied. Admin privileges required.', 'error', true, 'index.html');
+        return;
+      }
+      
+      if (!productId) {
+        showFeedback('Product ID not provided', 'error', true, 'products_data.html');
+        return;
+      }
+      
+      loadProductData();
+      setupProductTypeListener();
+    });
+
+    function handleAuth() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    }
+
+    // Setup product type change listener
+    function setupProductTypeListener() {
+      $("#productType").on("change", function() {
+        const selectedValue = $(this).val();
+        if (selectedValue === "Others") {
+          $("#otherProductType").show();
+        } else {
+          $("#otherProductType").hide().val("");
+        }
+      });
+    }
+
+    // Extract product type from description
+    function extractProductType(description) {
+      if (!description) return 'Others';
+      
+      const typeMatch = description.match(/Product Type:\s*(.+)/);
+      if (typeMatch && typeMatch[1]) {
+        return typeMatch[1].trim();
+      }
+      return 'Others';
+    }
+
+    // Extract description without product type
+    function extractDescriptionWithoutType(description) {
+      if (!description) return '';
+      
+      // Remove the "Product Type: ..." part from description
+      return description.replace(/Product Type:\s*.+/, '').trim();
+    }
+
+    // Load product data
+    async function loadProductData() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load product data');
+        }
+
+        // Extract product type from description
+        const productType = extractProductType(data.product.description);
+        const descriptionWithoutType = extractDescriptionWithoutType(data.product.description);
+
+        // Fill form with product data
+        document.getElementById('title').value = data.product.title;
+        document.getElementById('description').value = descriptionWithoutType;
+        document.getElementById('price').value = data.product.price || 0;
+
+        // Set product type
+        const productTypeSelect = document.getElementById('productType');
+        if (['Books', 'Electronics', 'Accessories'].includes(productType)) {
+          productTypeSelect.value = productType;
+        } else {
+          productTypeSelect.value = 'Others';
+          document.getElementById('otherProductType').value = productType;
+          document.getElementById('otherProductType').style.display = 'block';
+        }
+
+      } catch (err) {
+        showFeedback('Error loading product data: ' + err.message, 'error');
+        window.location.href = 'products_data.html';
+      }
+    }
+
+    // Get current product type from form
+    function getCurrentProductType() {
+      const selectedType = document.getElementById('productType').value;
+      if (selectedType === 'Others') {
+        return document.getElementById('otherProductType').value || 'Others';
+      }
+      return selectedType;
+    }
+
+    // Update product
+    $("#editProductForm").on("submit", async function(e) {
+      e.preventDefault();
+
+      const title = $("#title").val().trim();
+      const description = $("#description").val().trim();
+      const price = parseFloat($("#price").val());
+      const productType = getCurrentProductType();
+
+      // Basic validation
+      if (!title || !description) {
+        showFeedback('Please fill all required fields', 'warning');
+        return;
+      }
+
+      if (price < 0) {
+        showFeedback('Price cannot be negative', 'warning');
+        return;
+      }
+
+      if (!productType) {
+        showFeedback('Please select a product type', 'warning');
+        return;
+      }
+
+      // Combine description with product type
+      const fullDescription = description + (description ? '\n\n' : '') + `Product Type: ${productType}`;
+
+      const productData = {
+        title: title,
+        description: fullDescription,
+        price: price
+      };
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(productData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to update product');
+        }
+
+        showFeedback('Product updated successfully!', 'success');
+        setTimeout(() => {
+          window.location.href = 'products_data.html';
+        }, 1500);
+
+      } catch (err) {
+        showFeedback('Error: ' + err.message, 'error');
+      }
+    });
+
+    function cancelEdit() {
+      window.location.href = 'products_data.html';
+    }
+  </script>
+</body>
+</html>

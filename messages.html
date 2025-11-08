@@ -6,6 +6,7 @@
   <title>Messages - CampusConnect</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
   <style>
     body {
       background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
@@ -217,53 +218,59 @@
       }
     }
 
-    // Mark single message as read
-    async function markAsRead(messageId) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/messages/${messageId}/read`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        });
-
-        if (response.ok) {
-          // Update UI
-          $(`#message-${messageId}`).removeClass('unread');
-          $(`#message-${messageId} button`).replaceWith('<span class="badge bg-success ms-3">Read</span>');
-          
-          // Reload message count in navbar
-          loadMessageCount();
-          loadMessages(); // Reload to update summary
-        }
-      } catch (err) {
-        console.error('Error marking message as read:', err);
-        alert('Failed to mark message as read');
+// Mark single message as read
+async function markAsRead(messageId) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/messages/${messageId}/read`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token
       }
+    });
+
+    if (response.ok) {
+      // Update UI
+      $(`#message-${messageId}`).removeClass('unread');
+      $(`#message-${messageId} button`).replaceWith('<span class="badge bg-success ms-3">Read</span>');
+      
+      // Reload message count in navbar
+      loadMessageCount();
+      loadMessages(); // Reload to update summary
+    } else {
+      const data = await response.json();
+      showFeedback(data.error || 'Failed to mark message as read', 'error');
     }
+  } catch (err) {
+    console.error('Error marking message as read:', err);
+    showFeedback('Network error: Could not mark message as read', 'error');
+  }
+}
 
-    // Mark all messages as read
-    async function markAllAsRead() {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/messages/mark-all-read', {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        });
-
-        if (response.ok) {
-          alert('All messages marked as read!');
-          loadMessages();
-          loadMessageCount();
-        }
-      } catch (err) {
-        console.error('Error marking all messages as read:', err);
-        alert('Failed to mark all messages as read');
+// Mark all messages as read
+async function markAllAsRead() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/messages/mark-all-read', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token
       }
+    });
+
+    if (response.ok) {
+      showFeedback('All messages marked as read!', 'success');
+      loadMessages();
+      loadMessageCount();
+    } else {
+      const data = await response.json();
+      showFeedback(data.error || 'Failed to mark all messages as read', 'error');
     }
+  } catch (err) {
+    console.error('Error marking all messages as read:', err);
+    showFeedback('Network error: Could not mark messages as read', 'error');
+  }
+}
 
     // Load message count for navbar badge
     async function loadMessageCount() {

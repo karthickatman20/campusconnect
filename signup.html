@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Campus Connect - Sign Up</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
-   <style>
+  <style>
     body {
       min-height: 100vh;
       display: flex;
@@ -18,6 +19,7 @@
       border-radius: 20px;
       box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
       transition: transform 0.2s;
+      margin-top: 20px; /* ADDED: Extra spacing from navbar */
     }
     .card:hover {
       transform: translateY(-8px);
@@ -33,7 +35,52 @@
       border-radius: 10px;
       margin-top: 10px;
     }
-    /* ADDED: Navbar styles */
+    /* Password Strength Meter */
+    .password-strength {
+      margin-top: 10px;
+    }
+    .strength-meter {
+      height: 8px;
+      border-radius: 4px;
+      background: #e9ecef;
+      margin-bottom: 5px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    .strength-text {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .requirement-list {
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+    .requirement {
+      margin-bottom: 3px;
+    }
+    .requirement.valid {
+      color: #28a745;
+    }
+    .requirement.invalid {
+      color: #6c757d;
+    }
+    .requirement i {
+      margin-right: 5px;
+    }
+    /* Confirm Password Icon */
+    .password-match-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+    }
+    /* Navbar styles */
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
@@ -41,11 +88,107 @@
       font-weight: bold;
       font-size: 1.5rem;
     }
+    /* ADDED: Ensure content is visible below navbar */
+    .main-content {
+      margin-top: 80px;
+      padding-top: 40px;
+    }
+
+    /* auth pages specific styles */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, #667eea, #764ba2, #4facfe, #00f2fe, #667eea);
+  animation: rotate 10s linear infinite;
+  opacity: 0.1;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(40px);
+  border-radius: var(--radius-2xl);
+  padding: 3rem;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 2;
+  max-width: 450px;
+  width: 100%;
+  animation: slideIn 0.8s ease-out;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  box-shadow: var(--shadow-lg);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.strength-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all var(--transition-normal);
+  border-radius: 3px;
+}
   </style>
 </head>
 <body class="d-flex flex-column">
 
-  <!-- ADDED: Top Navbar Row 1 -->
+  <!-- Top Navbar Row 1 -->
   <nav class="navbar navbar-light bg-light fixed-top nav-row">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
@@ -55,7 +198,7 @@
     </div>
   </nav>
 
-  <!-- ADDED: Top Navbar Row 2 -->
+  <!-- Top Navbar Row 2 -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
     <div class="container-fluid">
       <div class="navbar-nav">
@@ -66,56 +209,127 @@
     </div>
   </nav>
 
-  <div class="container d-flex justify-content-center align-items-center vh-100">
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDED: Main content wrapper with proper spacing -->
+  <div class="container d-flex justify-content-center align-items-center flex-grow-1 main-content">
     <div class="card p-4 shadow-lg" style="width: 35rem;">
       <div class="text-center mb-3">
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828466.png" width="70" class="mb-2">
         <h4 class="fw-bold">Create an Account</h4>
       </div>
       <form id="signupForm">
+        <!-- Name Field -->
         <div class="mb-3">
-          <input type="text" class="form-control" id="name" placeholder="Full Name">
-          <small id="nameError" class="error">Name must contain only letters</small>
+          <label for="name" class="form-label fw-bold">Full Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Enter your full name">
+          <small id="nameError" class="error">Name must contain only letters and spaces</small>
         </div>
+
+        <!-- Register Number Field -->
         <div class="mb-3">
-          <input type="text" class="form-control" id="regno" placeholder="Register Number">
-          <small id="regnoError" class="error">Invalid Register Number (Ex: 23BCA1234)</small>
+          <label for="regno" class="form-label fw-bold">Register Number</label>
+          <input type="text" class="form-control" id="regno" placeholder="Enter your register number (e.g., 23BCA1234)">
+          <small id="regnoError" class="error">Invalid Register Number (Format: 23BCA0001 - 23BCA1000)</small>
         </div>
+
+        <!-- Email Field -->
         <div class="mb-3">
-          <input type="text" class="form-control" id="email" placeholder="Email (must be VIT Email ID)">
+          <label for="email" class="form-label fw-bold">Email Address</label>
+          <input type="text" class="form-control" id="email" placeholder="Enter your VIT email address">
           <small id="emailError" class="error">Format: firstname.lastnameYYYY@vitstudent.ac.in</small>
         </div>
+
+        <!-- Address Field -->
         <div class="mb-3">
-          <input type="text" class="form-control" id="address" placeholder="Address">
+          <label for="address" class="form-label fw-bold">Address</label>
+          <input type="text" class="form-control" id="address" placeholder="Enter your current address">
           <small id="addressError" class="error">Address is required</small>
         </div>
+
+        <!-- Phone Field -->
         <div class="mb-3">
-          <input type="text" class="form-control" id="phone" placeholder="Phone No (10 digits)">
-          <small id="phoneError" class="error">Phone number must be 10 digits</small>
+          <label for="phone" class="form-label fw-bold">Phone Number</label>
+          <input type="text" class="form-control" id="phone" placeholder="Enter your 10-digit phone number">
+          <small id="phoneError" class="error">Phone number must be exactly 10 digits</small>
         </div>
         
         <!-- Role Selection -->
         <div class="mb-3">
-          <label class="form-label fw-bold">Role</label>
+          <label for="role" class="form-label fw-bold">Role</label>
           <select class="form-control" id="role">
             <option value="student">Student</option>
             <option value="admin">Admin</option>
           </select>
         </div>
 
+        <!-- Password Field with Strength Meter -->
         <div class="mb-3">
-          <input type="password" class="form-control" id="password" placeholder="Password">
-          <small id="passwordError" class="error">Password must be at least 6 characters</small>
+          <label for="password" class="form-label fw-bold">Password</label>
+          <input type="password" class="form-control" id="password" placeholder="Create a strong password">
+          
+          <!-- Password Strength Meter -->
+          <div class="password-strength">
+            <div class="strength-meter">
+              <div class="strength-fill" id="strengthFill"></div>
+            </div>
+            <div class="strength-text" id="strengthText">Password strength</div>
+          </div>
+          
+          <!-- Password Requirements -->
+          <div class="requirement-list">
+            <div class="requirement invalid" id="reqLength">
+              <i class="fas fa-circle"></i> At least 8 characters
+            </div>
+            <div class="requirement invalid" id="reqUppercase">
+              <i class="fas fa-circle"></i> One uppercase letter (A-Z)
+            </div>
+            <div class="requirement invalid" id="reqLowercase">
+              <i class="fas fa-circle"></i> One lowercase letter (a-z)
+            </div>
+            <div class="requirement invalid" id="reqNumber">
+              <i class="fas fa-circle"></i> One number (0-9)
+            </div>
+            <div class="requirement invalid" id="reqSpecial">
+              <i class="fas fa-circle"></i> One special character (!@#$%^&*)
+            </div>
+          </div>
+          
+          <small id="passwordError" class="error">Password does not meet requirements</small>
         </div>
+
+        <!-- Confirm Password Field with Real-time Validation -->
         <div class="mb-3">
-          <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password">
+          <label for="confirmPassword" class="form-label fw-bold">Confirm Password</label>
+          <div class="position-relative">
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter your password">
+            <span class="password-match-icon" id="confirmPasswordIcon"></span>
+          </div>
           <small id="confirmPasswordError" class="error">Passwords do not match</small>
         </div>
 
         <!-- Secret Code Section (only for Admin) -->
         <div id="secretCodeSection" class="secret-code-section">
           <div class="mb-3">
-            <label class="form-label fw-bold">Secret Code (for Admin only)</label>
+            <label for="secretCode" class="form-label fw-bold">Secret Code (for Admin only)</label>
             <input type="password" class="form-control" id="secretCode" placeholder="Enter secret code">
             <small id="secretCodeError" class="error">Secret code mismatch</small>
             <small class="text-muted">Contact system administrator for secret code</small>
@@ -132,10 +346,140 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
-    // ADDED: Go to home function
+    // Go to home function
     function goToHome() {
       window.location.href = "index.html";
+    }
+
+    // Custom feedback function
+    function showFeedback(message, type = 'info', autoRedirect = null, redirectUrl = null) {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      // Set colors and icons based on type
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+      
+      // Auto redirect for success messages
+      if (autoRedirect && redirectUrl) {
+        setTimeout(() => {
+          modal.hide();
+          window.location.href = redirectUrl;
+        }, 2000);
+      }
+    }
+
+    // Password strength checker
+    function checkPasswordStrength(password) {
+      let strength = 0;
+      const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*]/.test(password)
+      };
+
+      // Calculate strength score (0-100)
+      const requirementCount = Object.keys(requirements).length;
+      const metRequirements = Object.values(requirements).filter(Boolean).length;
+      strength = (metRequirements / requirementCount) * 100;
+
+      return { strength, requirements };
+    }
+
+    function updatePasswordStrength(password) {
+      const { strength, requirements } = checkPasswordStrength(password);
+      const strengthFill = document.getElementById('strengthFill');
+      const strengthText = document.getElementById('strengthText');
+
+      // Update progress bar
+      strengthFill.style.width = strength + '%';
+
+      // Update colors and text based on strength
+      if (strength < 40) {
+        strengthFill.style.backgroundColor = '#dc3545';
+        strengthText.textContent = 'Weak Password';
+        strengthText.style.color = '#dc3545';
+      } else if (strength < 80) {
+        strengthFill.style.backgroundColor = '#ffc107';
+        strengthText.textContent = 'Medium Password';
+        strengthText.style.color = '#ffc107';
+      } else {
+        strengthFill.style.backgroundColor = '#28a745';
+        strengthText.textContent = 'Strong Password';
+        strengthText.style.color = '#28a745';
+      }
+
+      // Update requirement indicators
+      document.getElementById('reqLength').className = requirements.length ? 
+        'requirement valid' : 'requirement invalid';
+      document.getElementById('reqUppercase').className = requirements.uppercase ? 
+        'requirement valid' : 'requirement invalid';
+      document.getElementById('reqLowercase').className = requirements.lowercase ? 
+        'requirement valid' : 'requirement invalid';
+      document.getElementById('reqNumber').className = requirements.number ? 
+        'requirement valid' : 'requirement invalid';
+      document.getElementById('reqSpecial').className = requirements.special ? 
+        'requirement valid' : 'requirement invalid';
+
+      // Update icons
+      const requirementsList = ['reqLength', 'reqUppercase', 'reqLowercase', 'reqNumber', 'reqSpecial'];
+      requirementsList.forEach(req => {
+        const element = document.getElementById(req);
+        const icon = element.querySelector('i');
+        if (element.className.includes('valid')) {
+          icon.className = 'fas fa-check-circle';
+        } else {
+          icon.className = 'fas fa-circle';
+        }
+      });
+
+      return requirements;
+    }
+
+    // Check password match in real-time
+    function checkPasswordMatch() {
+      const password = $("#password").val();
+      const confirmPassword = $("#confirmPassword").val();
+      const icon = $("#confirmPasswordIcon");
+      const input = $("#confirmPassword");
+      
+      if (confirmPassword === "") {
+        icon.html(""); // Clear icon when empty
+        input.removeClass("is-valid is-invalid");
+        $("#confirmPasswordError").hide();
+      } else if (password === confirmPassword) {
+        icon.html('<i class="fas fa-check-circle text-success"></i>');
+        input.removeClass("is-invalid").addClass("is-valid");
+        $("#confirmPasswordError").hide();
+      } else {
+        icon.html('<i class="fas fa-times-circle text-danger"></i>');
+        input.removeClass("is-valid").addClass("is-invalid");
+        $("#confirmPasswordError").show();
+      }
     }
 
     $(document).ready(function() {
@@ -150,110 +494,156 @@
         }
       });
 
-      $("#signupForm").on("submit", async function(e) {
-        e.preventDefault();
-
-        let isValid = true;
-
-        // Grab input values
-        let name = $("#name").val().trim();
-        let regno = $("#regno").val().trim();
-        let email = $("#email").val().trim();
-        let address = $("#address").val().trim();
-        let phone = $("#phone").val().trim();
-        let role = $("#role").val();
-        let password = $("#password").val().trim();
-        let confirmPassword = $("#confirmPassword").val().trim();
-        let secretCode = $("#secretCode").val().trim();
-
-        // Hide previous errors
-        $("small.error").hide();
-
-        // Validation
-        if (name === "" || !/^[A-Za-z\s]+$/.test(name)) {
-          $("#nameError").text("Name must contain only letters").show();
-          isValid = false;
-        }
-
-        let regnoPattern = /^(23BCA)(0*(?:[1-9][0-9]{0,2}|1000))$/i;
-        regno = regno.trim().toUpperCase();
-        if (!regnoPattern.test(regno)) {
-          $("#regnoError").text("Enter valid Register No (only 23BCA0001 - 23BCA1000, no special characters)").show();
-          isValid = false;
-        }
-
-        let emailPattern = /^[A-Za-z]+\.?[A-Za-z]+[0-9]{4}@vitstudent\.ac\.in$/;
-        if (email === "") {
-          $("#emailError").text("Email is required").show();
-          isValid = false;
-        } else if (!emailPattern.test(email)) {
-          $("#emailError").text("Please enter a valid VIT student email address").show();
-          isValid = false;
-        }
-
-        if (address === "") {
-          $("#addressError").text("Address is required").show();
-          isValid = false;
-        } else if (!/^[A-Za-z\s]+$/.test(address)) {
-          $("#addressError").text("Address should contain only letters").show();
-          isValid = false;
-        }
-
-        if (phone === "") {
-          $("#phoneError").text("Phone number is required").show();
-          isValid = false;
-        } else if (!/^[0-9]{10}$/.test(phone)) {
-          $("#phoneError").text("Phone number must be exactly 10 digits").show();
-          isValid = false;
-        }
-
-        if (password.length < 6) {
-          $("#passwordError").text("Password must be at least 6 characters").show();
-          isValid = false;
-        }
-
-        if (password !== confirmPassword) {
-          $("#confirmPasswordError").text("Passwords do not match").show();
-          isValid = false;
-        }
-
-        // Secret code validation for admin
-        if (role === "admin") {
-          if (secretCode !== "campus") {
-            $("#secretCodeError").text("Secret code mismatch").show();
-            isValid = false;
-          }
-        }
-
-        if (!isValid) return;
-
-        try {
-          const submitBtn = $("#signupForm button[type=submit]");
-          submitBtn.prop("disabled", true).text("Registering...");
-
-          const response = await fetch("http://localhost:5000/api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, regno, email, address, phone, role, password })
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            alert("❌ " + (data.error || "Registration failed"));
-            submitBtn.prop("disabled", false).text("Sign Up");
-            return;
-          }
-
-          alert("✅ Registration successful! Redirecting to login...");
-          window.location.href = "login.html";
-        } catch (err) {
-          console.error("Fetch error:", err);
-          alert("Server error: " + err.message);
-          $("#signupForm button[type=submit]").prop("disabled", false).text("Sign Up");
-        }
+      // Real-time password strength checking
+      $("#password").on("input", function() {
+        const password = $(this).val();
+        updatePasswordStrength(password);
+        // Also check password match when main password changes
+        checkPasswordMatch();
       });
+
+      // Real-time password match checking
+      $("#confirmPassword").on("input", checkPasswordMatch);
+
+$("#signupForm").on("submit", async function(e) {
+  e.preventDefault();
+
+  let isValid = true;
+
+  // Grab input values
+  let name = $("#name").val().trim();
+  let regno = $("#regno").val().trim();
+  let email = $("#email").val().trim();
+  let address = $("#address").val().trim();
+  let phone = $("#phone").val().trim();
+  let role = $("#role").val();
+  let password = $("#password").val().trim();
+  let confirmPassword = $("#confirmPassword").val().trim();
+  let secretCode = $("#secretCode").val().trim();
+
+  // Hide previous errors
+  $("small.error").hide();
+
+  // Validation
+  if (name === "" || !/^[A-Za-z\s]+$/.test(name)) {
+    $("#nameError").text("Name must contain only letters and spaces").show();
+    isValid = false;
+  }
+
+  let regnoPattern = /^23BCA(0[0-9]{3}|1000)$/i;
+  regno = regno.trim().toUpperCase();
+  if (!regnoPattern.test(regno)) {
+    $("#regnoError").text("Enter valid Register No (only 23BCA0001 - 23BCA1000)").show();
+    isValid = false;
+  }
+
+  let emailPattern = /^[A-Za-z]+\.?[A-Za-z]+[0-9]{4}@vitstudent\.ac\.in$/;
+  if (email === "") {
+    $("#emailError").text("Email is required").show();
+    isValid = false;
+  } else if (!emailPattern.test(email)) {
+    $("#emailError").text("Please enter a valid VIT student email address").show();
+    isValid = false;
+  }
+
+  if (address === "") {
+    $("#addressError").text("Address is required").show();
+    isValid = false;
+  }
+
+  if (phone === "") {
+    $("#phoneError").text("Phone number is required").show();
+    isValid = false;
+  } else if (!/^[0-9]{10}$/.test(phone)) {
+    $("#phoneError").text("Phone number must be exactly 10 digits").show();
+    isValid = false;
+  }
+
+  // Enhanced password validation
+  const passwordRequirements = updatePasswordStrength(password);
+  const isPasswordValid = Object.values(passwordRequirements).every(req => req === true);
+  
+  if (!isPasswordValid) {
+    $("#passwordError").text("Password does not meet all requirements").show();
+    isValid = false;
+  }
+
+  // Final password match check
+  if (password !== confirmPassword) {
+    $("#confirmPasswordError").text("Passwords do not match").show();
+    isValid = false;
+  }
+
+  // Secret code validation for admin
+  if (role === "admin") {
+    if (secretCode !== "campus") {
+      $("#secretCodeError").text("Secret code mismatch").show();
+      isValid = false;
+    }
+  }
+
+  if (!isValid) return;
+
+  try {
+    const submitBtn = $("#signupForm button[type=submit]");
+    submitBtn.prop("disabled", true).text("Registering...");
+
+    console.log("📤 Sending registration request to:", "http://localhost:5000/api/auth/register");
+    console.log("📝 Data being sent:", { name, regno, email, address, phone, role });
+
+    const response = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ 
+        name, 
+        regno, 
+        email, 
+        address, 
+        phone, 
+        role, 
+        password 
+      })
     });
-</script>
+
+    console.log("📥 Response status:", response.status);
+    console.log("📥 Response headers:", response.headers);
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("❌ Response is not JSON:", text);
+      showFeedback("Server returned an invalid response. Please try again.", "error");
+      submitBtn.prop("disabled", false).text("Sign Up");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("📥 Response data:", data);
+
+    if (!response.ok) {
+      console.error("❌ Server error:", data.error);
+      showFeedback(data.error || "Registration failed. Please try again.", "error");
+      submitBtn.prop("disabled", false).text("Sign Up");
+      return;
+    }
+
+    console.log("✅ Registration successful!");
+    showFeedback("🎉 Registration successful! Redirecting to login...", "success", true, "login.html");
+    
+  } catch (err) {
+    console.error("❌ Network error:", err);
+    if (err.name === 'TypeError') {
+      showFeedback("❌ Cannot connect to server. Please check if the backend is running on localhost:5000", "error");
+    } else {
+      showFeedback("❌ Network error: " + err.message, "error");
+    }
+    $("#signupForm button[type=submit]").prop("disabled", false).text("Sign Up");
+  }
+});
+    });
+  </script>
 </body>
 </html>

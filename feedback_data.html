@@ -6,6 +6,7 @@
   <title>Manage Feedback - CampusConnect Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
   <style>
     body {
       background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
@@ -36,23 +37,20 @@
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
-
     .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .search-bar {
       max-width: 400px;
       margin: 0 auto 30px;
@@ -67,13 +65,11 @@
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Manage Feedback</span>
       <div class="d-flex">
         <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
-
-
+          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+            <i class="fas fa-bell"></i>
+            <span class="message-badge" id="messageCount">0</span>
+          </button>
+        </div>
         <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
       </div>
     </div>
@@ -87,6 +83,26 @@
       </div>
     </div>
   </nav>
+
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="container">
     <h2 class="text-center mb-4 fw-bold">Manage Feedback</h2>
@@ -108,14 +124,42 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Custom feedback function
+    function showFeedback(message, type = 'info') {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+    }
+
     // Check authentication and admin role
     document.addEventListener('DOMContentLoaded', function() {
       const token = localStorage.getItem('token');
       const userRole = localStorage.getItem('userRole');
       
       if (!token || userRole !== 'admin') {
-        alert('Access denied. Admin privileges required.');
-        window.location.href = 'index.html';
+        showFeedback('Access denied. Admin privileges required.', 'error', true, 'index.html');
         return;
       }
       
@@ -211,58 +255,88 @@
       }
     }
 
-    // Remove feedback
-    async function removeFeedback(feedbackId, userName) {
-      if (!confirm(`Are you sure you want to remove feedback from "${userName}"?`)) {
-        return;
+// Remove feedback
+async function removeFeedback(feedbackId, userName) {
+  // Create custom confirmation modal
+  const confirmModal = `
+    <div class="modal fade" id="confirmRemoveModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-warning text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-exclamation-triangle me-2"></i>Confirm Removal
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to remove feedback from "${userName}"? This action cannot be undone.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Yes, Remove Feedback</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remove any existing modal and add new one
+  $("#confirmRemoveModal").remove();
+  $("body").append(confirmModal);
+  
+  const modal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
+  modal.show();
+  
+  // Handle confirmation
+  $("#confirmRemoveBtn").off('click').on('click', async function() {
+    modal.hide();
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/admin/feedback/${feedbackId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to remove feedback');
       }
 
+      showFeedback('Feedback removed successfully!', 'success');
+      loadFeedback();
+
+    } catch (err) {
+      showFeedback('Error: ' + err.message, 'error');
+    }
+  });
+}
+
+    // Load message count for navbar
+    async function loadMessageCount() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/admin/feedback/${feedbackId}`, {
-          method: 'DELETE',
+        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
           headers: {
             'Authorization': 'Bearer ' + token
           }
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to remove feedback');
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('messageCount').textContent = data.count;
         }
-
-        alert('✅ Feedback removed successfully!');
-        loadFeedback(); // Reload the list
-
       } catch (err) {
-        alert('❌ Error: ' + err.message);
+        console.error('Error loading message count:', err);
       }
     }
 
-    // Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
+    function viewMessages() {
+      window.location.href = 'messages.html';
     }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
-
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
   </script>
 </body>
 </html>

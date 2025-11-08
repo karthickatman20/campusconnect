@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Campus Connect - Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
   <style>
     body {
@@ -12,7 +13,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding-top: 120px; /* ADDED: For navbar space */
+      padding-top: 120px;
     }
     .card {
       border-radius: 20px;
@@ -26,7 +27,7 @@
       color: red;
       display: none;
     }
-    /* ADDED: Navbar styles */
+    /* Navbar styles */
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
@@ -34,11 +35,102 @@
       font-weight: bold;
       font-size: 1.5rem;
     }
+
+    /* auth pages specific styles */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, #667eea, #764ba2, #4facfe, #00f2fe, #667eea);
+  animation: rotate 10s linear infinite;
+  opacity: 0.1;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(40px);
+  border-radius: var(--radius-2xl);
+  padding: 3rem;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 2;
+  max-width: 450px;
+  width: 100%;
+  animation: slideIn 0.8s ease-out;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  box-shadow: var(--shadow-lg);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.strength-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all var(--transition-normal);
+  border-radius: 3px;
+}
   </style>
 </head>
 <body class="d-flex flex-column">
 
-  <!-- ADDED: Top Navbar Row 1 -->
+  <!-- Top Navbar Row 1 -->
   <nav class="navbar navbar-light bg-light fixed-top nav-row">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
@@ -48,7 +140,7 @@
     </div>
   </nav>
 
-  <!-- ADDED: Top Navbar Row 2 -->
+  <!-- Top Navbar Row 2 -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
     <div class="container-fluid">
       <div class="navbar-nav">
@@ -58,6 +150,26 @@
       </div>
     </div>
   </nav>
+
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 shadow-lg" style="width: 25rem;">
@@ -70,13 +182,11 @@
         <!-- Email field -->
         <div class="mb-3">
           <input type="email" class="form-control" id="email" placeholder="Email" required>
-          <small id="emailError" class="text-danger d-none">Enter a valid email address</small>
         </div>
 
         <!-- Password field -->
         <div class="mb-3">
           <input type="password" class="form-control" id="password" placeholder="Password" required>
-          <small id="passwordError" class="text-danger d-none">Password must be at least 6 characters</small>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Login</button>
@@ -91,9 +201,47 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ADDED: Go to home function
+    // Go to home function
     function goToHome() {
       window.location.href = "index.html";
+    }
+
+    // Custom feedback function
+    function showFeedback(message, type = 'info', autoRedirect = null, redirectUrl = null) {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      // Set colors and icons based on type
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+      
+      // Auto redirect for success messages
+      if (autoRedirect && redirectUrl) {
+        setTimeout(() => {
+          modal.hide();
+          window.location.href = redirectUrl;
+        }, 2000);
+      }
     }
 
     $(document).ready(function() {
@@ -106,17 +254,13 @@
         // Simple validation
         const emailRegex = /^[A-Za-z]+\.?[A-Za-z]+[0-9]{4}@vitstudent\.ac\.in$/;
         if (!emailRegex.test(email)) {
-          $("#emailError").removeClass("d-none");
+          showFeedback("Please enter a valid VIT student email address", "error");
           return;
-        } else {
-          $("#emailError").addClass("d-none");
         }
 
         if (password.length < 6) {
-          $("#passwordError").removeClass("d-none");
+          showFeedback("Password must be at least 6 characters", "error");
           return;
-        } else {
-          $("#passwordError").addClass("d-none");
         }
 
         try {
@@ -129,29 +273,23 @@
           const data = await response.json();
 
           if (!response.ok) {
-            alert("❌ " + (data.error || "Login failed"));
+            showFeedback(data.error || "Login failed", "error");
             return;
           }
 
           localStorage.setItem("token", data.token);
           localStorage.setItem("userId", data.user._id);
           localStorage.setItem("username", data.user.name);
-          localStorage.setItem("userRole", data.user.role); // Store user role
+          localStorage.setItem("userRole", data.user.role);
 
-          alert("✅ Login successful! Redirecting...");
+          showFeedback("Login successful! Redirecting...", "success", true, 
+            data.user.role === 'admin' ? "admin_dashboard.html" : "index.html");
 
-          // Redirect based on role
-          if (data.user.role === 'admin') {
-            window.location.href = "admin_dashboard.html";
-          } else {
-            window.location.href = "index.html";
-          }
         } catch (err) {
-          alert("🚫 Server error: " + err.message);
+          showFeedback("Server error: " + err.message, "error");
         }
       });
     });
   </script>
-
 </body>
 </html>

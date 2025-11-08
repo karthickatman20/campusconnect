@@ -41,23 +41,20 @@
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
-
     .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="d-flex flex-column">
@@ -68,13 +65,11 @@
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
       <div class="d-flex">
         <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
-
-
+          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+            <i class="fas fa-bell"></i>
+            <span class="message-badge" id="messageCount">0</span>
+          </button>
+        </div>
         <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
@@ -88,6 +83,26 @@
       </div>
     </div>
   </nav>
+
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="container">
     <div class="feedback-card">
@@ -133,12 +148,47 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Custom feedback function
+    function showFeedback(message, type = 'info', autoRedirect = null, redirectUrl = null) {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+      
+      if (autoRedirect && redirectUrl) {
+        setTimeout(() => {
+          modal.hide();
+          window.location.href = redirectUrl;
+        }, 2000);
+      }
+    }
+
     // Check authentication and update navbar
     document.addEventListener('DOMContentLoaded', function() {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please sign up to provide feedback');
-        window.location.href = 'login.html';
+        showFeedback('Please sign up to provide feedback', 'warning', true, 'login.html');
         return;
       }
       updateNavbar();
@@ -252,17 +302,17 @@
       const file = fileInput ? fileInput.files[0] : null;
 
       if (!file) {
-        alert("Please upload a product image");
+        showFeedback("Please upload a product image", "warning");
         return;
       }
 
       if (!feedbackText) {
-        alert("Please enter your feedback");
+        showFeedback("Please enter your feedback", "warning");
         return;
       }
 
       if (!rating) {
-        alert("Please provide a rating");
+        showFeedback("Please provide a rating", "warning");
         return;
       }
 
@@ -285,40 +335,38 @@
         const data = await response.json();
 
         if (!response.ok) {
-          alert("❌ " + (data.error || "Failed to submit feedback"));
+          showFeedback(data.error || "Failed to submit feedback", "error");
           return;
         }
 
-        alert("✅ Feedback Successfully Submitted!");
-        window.location.href = "index.html";
+        showFeedback("Feedback Successfully Submitted!", "success", true, "index.html");
       } catch (err) {
-        alert("🚫 Server error: " + err.message);
+        showFeedback("Server error: " + err.message, "error");
       }
     });
 
     // Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
+    async function loadMessageCount() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('messageCount').textContent = data.count;
+        }
+      } catch (err) {
+        console.error('Error loading message count:', err);
       }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
     }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
 
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
+    function viewMessages() {
+      window.location.href = 'messages.html';
+    }
   </script>
 </body>
 </html>

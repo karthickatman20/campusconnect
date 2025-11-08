@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>My Orders - CampusConnect</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="maincss.css">
   <style>
     body {
       background: linear-gradient(to right, #56ccf2, #2f80ed);
@@ -29,23 +31,20 @@
     .nav-row {
       border-bottom: 1px solid #dee2e6;
     }
-
     .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="container py-4">
@@ -56,13 +55,11 @@
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
       <div class="d-flex">
         <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
-
-
+          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+            <i class="fas fa-bell"></i>
+            <span class="message-badge" id="messageCount">0</span>
+          </button>
+        </div>
         <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
@@ -77,6 +74,26 @@
     </div>
   </nav>
 
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h3 class="text-center text-light fw-bold mb-4">My Orders</h3>
 
   <div id="ordersContainer"></div>
@@ -86,149 +103,221 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-// Check authentication on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Please login first to access this page');
-    window.location.href = 'login.html';
-    return;
-  }
-  updateNavbar();
-  loadOrders();
-});
-
-// Navbar functionality
-function updateNavbar() {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  const authButton = document.getElementById('authButton');
-  const navLinks = document.getElementById('navLinks');
-  
-  if (token) {
-    authButton.textContent = 'Sign Out';
-    authButton.className = 'btn btn-outline-danger';
-    
-    let adminLink = '';
-    if (userRole === 'admin') {
-      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-    }
-    
-    navLinks.innerHTML = `
-      ${adminLink}
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="profile.html">View Profile</a>
-      <a class="nav-link" href="orders.html">My Orders</a>
-      <a class="nav-link" href="feedback.html">Feedback</a>
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  } else {
-    authButton.textContent = 'Login';
-    authButton.className = 'btn btn-outline-primary';
-    navLinks.innerHTML = `
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  }
-}
-
-function handleAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    updateNavbar();
-    window.location.href = 'index.html';
-  } else {
-    window.location.href = 'login.html';
-  }
-}
-
-async function loadOrders() {
-  try {
-    const buyerId = localStorage.getItem("userId");
-    const res = await fetch(`http://localhost:5000/api/orders?buyerId=${buyerId}`);
-    const orders = await res.json();
-
-    const container = $("#ordersContainer");
-    container.empty();
-
-    if (!orders.length) {
-      container.html('<p class="text-center text-white">No orders yet.</p>');
-      return;
-    }
-
-    orders.forEach(order => {
-      const prod = order.product || {};
-      const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : "https://via.placeholder.com/200x150?text=No+Image";
+    // Custom feedback function
+    function showFeedback(message, type = 'info') {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
       
-      // Check if product is free (price = 0)
-      const priceDisplay = prod.price === 0 ? 
-        '<span class="free-price">💰 Price: FREE</span>' : 
-        `💰 Price: ₹${prod.price}`;
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+    }
 
-      const card = `
-        <div class="order-card">
-          <img src="${img}" alt="${prod.title || 'Product'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
-          <h5>${prod.title || "Unnamed Product"}</h5>
-          <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
-          <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
-          <p>${priceDisplay}</p>
-          <p class="ordered-text">✅ Ordered Successfully</p>
-          <button class="btn btn-danger cancel-btn" data-id="${order._id}">Cancel Order</button>
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showFeedback('Please login first to access this page', 'warning', true, 'login.html');
+        return;
+      }
+      updateNavbar();
+      loadOrders();
+    });
+
+    // Navbar functionality
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const buyerId = localStorage.getItem("userId");
+        const res = await fetch(`http://localhost:5000/api/orders?buyerId=${buyerId}`);
+        const orders = await res.json();
+
+        const container = $("#ordersContainer");
+        container.empty();
+
+        if (!orders.length) {
+          container.html('<p class="text-center text-white">No orders yet.</p>');
+          return;
+        }
+
+        orders.forEach(order => {
+          const prod = order.product || {};
+          const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : "https://via.placeholder.com/200x150?text=No+Image";
+          
+          // Check if product is free (price = 0)
+          const priceDisplay = prod.price === 0 ? 
+            '<span class="free-price">💰 Price: FREE</span>' : 
+            `💰 Price: ₹${prod.price}`;
+
+          const card = `
+            <div class="order-card">
+              <img src="${img}" alt="${prod.title || 'Product'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
+              <h5>${prod.title || "Unnamed Product"}</h5>
+              <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
+              <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
+              <p>${priceDisplay}</p>
+              <p class="ordered-text">✅ Ordered Successfully</p>
+              <button class="btn btn-danger cancel-btn" data-id="${order._id}">Cancel Order</button>
+            </div>
+          `;
+          container.append(card);
+        });
+      } catch (err) {
+        console.error(err);
+        $("#ordersContainer").html('<p class="text-danger text-center">Failed to load orders.</p>');
+      }
+    }
+
+    $(document).on("click", ".cancel-btn", async function() {
+      const id = $(this).data("id");
+      
+      // Use custom confirmation modal instead of native confirm
+      const confirmMessage = "Are you sure you want to cancel this order?";
+      
+      // Create a custom confirmation modal
+      const confirmModal = `
+        <div class="modal fade" id="confirmCancelModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">
+                  <i class="fas fa-exclamation-triangle me-2"></i>Confirm Cancellation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                ${confirmMessage}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
+                <button type="button" class="btn btn-danger" id="confirmCancelBtn">Yes, Cancel Order</button>
+              </div>
+            </div>
+          </div>
         </div>
       `;
-      container.append(card);
+      
+      // Remove any existing modal and add new one
+      $("#confirmCancelModal").remove();
+      $("body").append(confirmModal);
+      
+      const modal = new bootstrap.Modal(document.getElementById('confirmCancelModal'));
+      modal.show();
+      
+      // Handle confirmation
+      $("#confirmCancelBtn").off('click').on('click', async function() {
+        modal.hide();
+        
+        try {
+          const res = await fetch(`http://localhost:5000/api/orders/${id}`, { 
+            method: "DELETE" 
+          });
+          const data = await res.json();
+          
+          if (res.ok) {
+            showFeedback(data.message || "Order cancelled successfully!", "success");
+            loadOrders();
+          } else {
+            showFeedback(data.error || "Failed to cancel order", "error");
+          }
+        } catch (err) {
+          showFeedback("Error cancelling order: " + err.message, "error");
+        }
+      });
     });
-  } catch (err) {
-    console.error(err);
-    $("#ordersContainer").html('<p class="text-danger text-center">Failed to load orders.</p>');
-  }
-}
 
-$(document).on("click", ".cancel-btn", async function() {
-  const id = $(this).data("id");
-  if (!confirm("Cancel this order?")) return;
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/orders/${id}`, { method: "DELETE" });
-    const data = await res.json();
-    alert(data.message);
-    loadOrders();
-  } catch (err) {
-    alert("Error cancelling order");
-  }
-});
-
-// Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
+    // Load message count for navbar
+    async function loadMessageCount() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('messageCount').textContent = data.count;
+        }
+      } catch (err) {
+        console.error('Error loading message count:', err);
       }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
     }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
 
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
+    function viewMessages() {
+      window.location.href = 'messages.html';
+    }
   </script>
 </body>
 </html>
