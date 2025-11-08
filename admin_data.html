@@ -7,51 +7,31 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
-  <style>
-    body {
-      background: linear-gradient(to right, #64dfdf, #80ffdb, #72efdd, #48bfe3, #5390d9, #5e60ce);
-      min-height: 100vh;
-      padding-top: 120px;
-      font-family: 'Poppins', sans-serif;
-    }
+<style>
     .admin-card {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease;
-      border: 2px solid #dc3545;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all var(--transition-normal);
+        border: 2px solid var(--danger-color);
+        border-left: 6px solid var(--danger-color);
     }
     .admin-card:hover {
-      transform: translateY(-5px);
-    }
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
-    }
-    .search-bar {
-      max-width: 400px;
-      margin: 0 auto 30px;
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-2xl);
     }
     .current-user {
-      background: #e8f5e8;
-      border-color: #28a745;
+        background: rgba(40, 167, 69, 0.1);
+        border-color: var(--success-color);
     }
-    .message-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #dc3545;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .search-bar {
+        max-width: 400px;
+        margin: 0 auto 2rem;
     }
-  </style>
+</style>
 </head>
 <body class="d-flex flex-column">
 

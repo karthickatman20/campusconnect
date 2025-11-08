@@ -7,55 +7,41 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
+<style>
     .contact-card {
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      padding: 30px;
-      background: #fff;
-      margin-bottom: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-2xl);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all var(--transition-normal);
+    }
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
     }
     .contact-card img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 15px;
-      border: 3px solid #ddd;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+        border: 3px solid var(--primary-color);
+        box-shadow: var(--shadow-lg);
     }
     .social-icons a {
-      margin: 0 10px;
-      font-size: 22px;
-      color: #333;
-      transition: 0.3s;
+        margin: 0 10px;
+        font-size: 1.5rem;
+        color: var(--text-dark);
+        transition: var(--transition-normal);
     }
     .social-icons a:hover {
-      color: #007bff;
+        color: var(--primary-color);
+        transform: translateY(-3px);
     }
-    body {
-      padding-top: 120px;
-    }
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-  </style>
+</style>
 </head>
 <body class="d-flex flex-column">
 

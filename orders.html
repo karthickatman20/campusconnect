@@ -6,46 +6,62 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
-  <style>
-    body {
-      background: linear-gradient(to right, #56ccf2, #2f80ed);
-      min-height: 100vh;
-      font-family: 'Poppins', sans-serif;
-      padding-top: 120px;
+<style>
+    .main-content {
+        margin-top: 120px;
+        min-height: calc(100vh - 200px);
     }
     .order-card {
-      border-radius: 12px;
-      background: #fff;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        width: 100%;
+        max-width: 350px;
+        margin-left: auto;
+        margin-right: auto;
+        transition: all var(--transition-normal);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+    }
+    .order-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--success-gradient);
+    }
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-2xl);
+    }
+    .order-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
     }
     .ordered-text {
-      color: green;
-      font-weight: bold;
+        color: var(--success-color);
+        font-weight: bold;
+        font-size: 1.1rem;
     }
     .free-price {
-      color: #28a745;
-      font-weight: bold;
+        color: var(--success-color);
+        font-weight: bold;
+        font-size: 1.1rem;
     }
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
+    .cancel-btn {
+        margin-top: 1rem;
+        width: 100%;
     }
-    .message-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #dc3545;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
+</style>
 </head>
 <body class="container py-4">
 

@@ -8,222 +8,100 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
-
-/* index.html - Premium Homepage */
-.hero-section {
-  min-height: 100vh;
-  background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.9) 0%, 
-    rgba(118, 75, 162, 0.8) 50%, 
-    rgba(79, 172, 254, 0.7) 100%),
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/></linearGradient></defs><rect width="1000" height="1000" fill="url(%23grad)"/></svg>');
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
-  animation: particleFloat 15s ease-in-out infinite;
-}
-
-.hero-title {
-  font-size: 4rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.feature-card-premium {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  padding: 2.5rem;
-  text-align: center;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card-premium::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+<style>
+  /* Make all card images the same height and nicely fitted */
+.card img {
   width: 100%;
+  height: 250px; /* adjust as needed */
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Ensure all cards have equal height */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: var(--transition-slow);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.feature-card-premium:hover::before {
-  left: 100%;
-}
-
-.feature-card-premium:hover {
-  transform: translateY(-20px) scale(1.05);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-}
-
-/* Navbar for index */
-.navbar-home {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  margin: 20px;
-  border-radius: var(--radius-xl);
-  animation: slideIn 0.8s ease-out;
-}
-    .card img {
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      height: 180px;
-      object-fit: cover;
-    }
-    
-    /* Navbar Styles */
-    .navbar-brand {
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-    
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
+/* Keep button section aligned at the bottom */
+.card-body {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
-    
-    /* Footer */
-    footer {
-      background: rgba(255, 255, 255, 0.9);
-      text-align: center;
-      padding: 15px;
-      border-radius: 10px 10px 0 0;
-      font-size: 14px;
-      box-shadow: 0px -2px 10px rgba(0,0,0,0.1);
-      margin-top: 30px;
+
+/* Center the button consistently */
+.card-body button {
+  align-self: center;
+  margin-top: auto;
+  width: 120px;
+}
+    .hero-section {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
     }
-    footer .social-icons {
-      margin-top: 10px;
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
     }
-    footer .social-icons a {
-      margin: 0 8px;
-      font-size: 20px;
-      color: #333;
-      transition: 0.3s;
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea, #f093fb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
-    footer .social-icons a:hover {
-      color: #007bff;
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-light);
+        margin-bottom: 2rem;
     }
-    footer hr {
-      margin-bottom: 15px;
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
     }
-
-    /* Card hover effects */
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        text-align: center;
+        transition: all var(--transition-normal);
     }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    .feature-card:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-10px) scale(1.05);
     }
-
-    /* index.html specific styles */
-.hero-section {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #667eea, #f093fb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-subtitle {
-  font-size: 1.3rem;
-  color: var(--text-light);
-  margin-bottom: 2rem;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin: 3rem 0;
-}
-
-.feature-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-xl);
-  padding: 2rem;
-  text-align: center;
-  transition: all var(--transition-normal);
-}
-
-.feature-card:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-10px) scale(1.05);
-}
-
-.feature-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-  </style>
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
 </head>
 <body class="d-flex flex-column">
 
@@ -245,7 +123,7 @@
   </nav>
 
   <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light nav-row" id="mainNavbar">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light nav-row" id="mainNavbar" style="top:60px">
     <div class="container-fluid">
       <div class="navbar-nav" id="navLinks">
         <!-- Links will be populated dynamically based on login status -->

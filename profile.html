@@ -5,193 +5,142 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Profile - CampusConnect</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="maincss.css">
-  <style>
-    body {
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #5390d9, #80ffdb, #64dfdf);
-      background-size: 300% 300%;
-      animation: gradientShift 10s ease infinite;
-      font-family: 'Poppins', sans-serif;
-      padding-top: 120px;
+<style>
+    .profile-page-body {
+        min-height: 100vh;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .profile-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        width: 100%;
+        margin-top: 120px;
     }
-
     .profile-card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(15px);
-      border-radius: 25px;
-      box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-      padding: 40px;
-      width: 90%;
-      max-width: 500px;
-      color: #fff;
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
-      border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(30px);
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-2xl);
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        color: var(--text-dark);
+        animation: slideIn 0.8s ease-out;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: var(--primary-gradient);
     }
-
-    .profile-card img {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      border: 4px solid #fff;
-      object-fit: cover;
-      margin-bottom: 15px;
-      box-shadow: 0 0 15px rgba(255,255,255,0.5);
-      transition: transform 0.3s ease;
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 4px solid var(--white);
+        box-shadow: var(--shadow-xl);
+        margin: 0 auto 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition-normal);
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
     }
-    .profile-card img:hover {
-      transform: scale(1.05);
+    .profile-avatar:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
     }
-
-    .profile-card h3 {
-      font-weight: 700;
-      font-size: 1.8rem;
-      margin-bottom: 5px;
+    .profile-name {
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
-    .profile-card p.text-light-50 {
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-      opacity: 0.85;
+    .profile-subtitle {
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        font-size: 1rem;
     }
     .profile-info {
-      text-align: left;
-      margin-top: 20px;
+        text-align: left;
+        margin-top: 1.5rem;
     }
-    .profile-info p {
-      background: rgba(255,255,255,0.1);
-      padding: 12px 16px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-weight: 500;
-      transition: background 0.3s ease;
+    .profile-info-item {
+        background: rgba(102, 126, 234, 0.1);
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary-color);
+        transition: var(--transition-normal);
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
-    .profile-info p:hover {
-      background: rgba(255,255,255,0.2);
+    .profile-info-item:hover {
+        background: rgba(102, 126, 234, 0.2);
+        transform: translateX(10px);
     }
-    .profile-info i {
-      font-size: 1.2rem;
-      color: #fff;
+    .profile-info-item i {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        width: 20px;
     }
-
-    .btn-glow {
-      background: #48bfe3;
-      border: none;
-      color: #fff;
-      font-weight: 600;
-      border-radius: 15px;
-      padding: 12px 25px;
-      margin-top: 25px;
-      transition: 0.3s ease;
-      box-shadow: 0 0 12px #48bfe3, 0 0 20px #48bfe3;
+    .profile-info-text {
+        flex: 1;
     }
-    .btn-glow:hover {
-      background: #5e60ce;
-      box-shadow: 0 0 20px #5e60ce, 0 0 30px #5e60ce;
+    .btn-profile-back {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        transition: var(--transition-normal);
+        box-shadow: var(--shadow-md);
+        width: 100%;
     }
-    .nav-row {
-      border-bottom: 1px solid #dee2e6;
+    .btn-profile-back:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl);
     }
-
-    .message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* profile.html specific styles */
-.profile-container {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 0;
-}
-
-.profile-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(30px);
-  border-radius: var(--radius-2xl);
-  padding: 3rem;
-  box-shadow: var(--shadow-2xl);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-  max-width: 500px;
-  width: 100%;
-}
-
-.profile-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: var(--primary-gradient);
-}
-
-.profile-avatar {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 4px solid var(--white);
-  box-shadow: var(--shadow-xl);
-  margin: 0 auto 1.5rem;
-  position: relative;
-  overflow: hidden;
-  transition: var(--transition-normal);
-}
-
-.profile-avatar:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-}
-
-.profile-info-item {
-  background: rgba(102, 126, 234, 0.1);
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-lg);
-  margin-bottom: 1rem;
-  border-left: 4px solid var(--primary-color);
-  transition: var(--transition-normal);
-}
-
-.profile-info-item:hover {
-  background: rgba(102, 126, 234, 0.2);
-  transform: translateX(10px);
-}
-
-
-  </style>
+    .role-badge {
+        background: var(--success-gradient);
+        color: white;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+    .role-badge.admin {
+        background: var(--danger-gradient);
+    }
+</style>
 </head>
-<body>
+<body class="profile-page-body">
 
   <!-- Top Navbar Row 1 -->
   <nav class="navbar navbar-light bg-light fixed-top nav-row">
@@ -199,13 +148,11 @@
       <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
       <div class="d-flex">
         <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
-
-
+          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
+            <i class="fas fa-bell"></i>
+            <span class="message-badge" id="messageCount">0</span>
+          </button>
+        </div>
         <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
@@ -220,137 +167,189 @@
     </div>
   </nav>
 
-  <div class="profile-card" id="profileCard">
-    <img id="userImg" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Profile Picture">
-    <h3 id="userName">Loading...</h3>
-    <p class="text-light-50">CampusConnect Member</p>
+  <div class="profile-container">
+    <div class="profile-card" id="profileCard">
+      <div class="profile-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      
+      <h3 class="profile-name" id="userName">Loading...</h3>
+      <p class="profile-subtitle">CampusConnect Member</p>
 
-    <div class="profile-info">
-      <p><i class="bi bi-envelope-fill"></i> <span id="userEmail">Fetching...</span></p>
-      <p><i class="bi bi-telephone-fill"></i> <span id="userPhone">Fetching...</span></p>
-      <p><i class="bi bi-building"></i> <span id="userAddress">Fetching...</span></p>
-      <p><i class="bi bi-card-text"></i> Reg No: <span id="userReg">Fetching...</span></p>
-      <p><i class="bi bi-person-badge"></i> Role: <span id="userRole">Fetching...</span></p>
+      <div class="profile-info">
+        <div class="profile-info-item">
+          <i class="fas fa-envelope"></i>
+          <div class="profile-info-text">
+            <strong>Email:</strong> <span id="userEmail">Fetching...</span>
+          </div>
+        </div>
+        
+        <div class="profile-info-item">
+          <i class="fas fa-phone"></i>
+          <div class="profile-info-text">
+            <strong>Phone:</strong> <span id="userPhone">Fetching...</span>
+          </div>
+        </div>
+        
+        <div class="profile-info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div class="profile-info-text">
+            <strong>Address:</strong> <span id="userAddress">Fetching...</span>
+          </div>
+        </div>
+        
+        <div class="profile-info-item">
+          <i class="fas fa-id-card"></i>
+          <div class="profile-info-text">
+            <strong>Reg No:</strong> <span id="userReg">Fetching...</span>
+          </div>
+        </div>
+        
+        <div class="profile-info-item">
+          <i class="fas fa-user-tag"></i>
+          <div class="profile-info-text">
+            <strong>Role:</strong> 
+            <span id="userRole">Fetching...</span>
+            <span class="role-badge" id="roleBadge"></span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-profile-back" onclick="goToHome()">
+        <i class="fas fa-home me-2"></i> Back to Home
+      </button>
     </div>
-
-    <a href="index.html" class="btn btn-glow mt-3"><i class="bi bi-house-door"></i> Back to Home</a>
   </div>
 
   <script>
-// Check authentication on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Please login first to access this page');
-    window.location.href = 'login.html';
-    return;
-  }
-  updateNavbar();
-  loadUserProfile();
-});
-
-// Navbar functionality
-function updateNavbar() {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  const authButton = document.getElementById('authButton');
-  const navLinks = document.getElementById('navLinks');
-  
-  if (token) {
-    authButton.textContent = 'Sign Out';
-    authButton.className = 'btn btn-outline-danger';
-    
-    let adminLink = '';
-    if (userRole === 'admin') {
-      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-    }
-    
-    navLinks.innerHTML = `
-      ${adminLink}
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="profile.html">View Profile</a>
-      <a class="nav-link" href="orders.html">My Orders</a>
-      <a class="nav-link" href="feedback.html">Feedback</a>
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  } else {
-    authButton.textContent = 'Login';
-    authButton.className = 'btn btn-outline-primary';
-    navLinks.innerHTML = `
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  }
-}
-
-function handleAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    updateNavbar();
-    window.location.href = 'index.html';
-  } else {
-    window.location.href = 'login.html';
-  }
-}
-
-// Get userId from localStorage
-const userId = localStorage.getItem("userId");
-const token = localStorage.getItem("token");
-
-async function loadUserProfile() {
-  try {
-    const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error("User not found");
-
-    const user = await res.json();
-
-    document.getElementById("userName").textContent = user.name;
-    document.getElementById("userEmail").textContent = user.email;
-    document.getElementById("userPhone").textContent = user.phone;
-    document.getElementById("userAddress").textContent = user.address;
-    document.getElementById("userReg").textContent = user.regno;
-    document.getElementById("userRole").textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-  } catch (err) {
-    document.getElementById("profileCard").innerHTML = `
-      <h3 class="text-danger">Failed to load profile</h3>
-      <p>${err.message}</p>
-    `;
-    console.error(err);
-  }
-}
-
-// Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login first to access this page');
+        window.location.href = 'login.html';
+        return;
       }
+      updateNavbar();
+      loadUserProfile();
     });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
-    }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
 
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
+    // Navbar functionality
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('userRole');
+      const authButton = document.getElementById('authButton');
+      const navLinks = document.getElementById('navLinks');
+      
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        
+        let adminLink = '';
+        if (userRole === 'admin') {
+          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
+        }
+        
+        navLinks.innerHTML = `
+          ${adminLink}
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="profile.html">View Profile</a>
+          <a class="nav-link" href="orders.html">My Orders</a>
+          <a class="nav-link" href="feedback.html">Feedback</a>
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-primary';
+        navLinks.innerHTML = `
+          <a class="nav-link" href="contact.html">Contact Us</a>
+          <a class="nav-link" href="services.html">Services</a>
+          <a class="nav-link" href="address.html">Address</a>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function goToHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Get userId from localStorage
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+
+    async function loadUserProfile() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("User not found");
+
+        const user = await res.json();
+
+        document.getElementById("userName").textContent = user.name;
+        document.getElementById("userEmail").textContent = user.email;
+        document.getElementById("userPhone").textContent = user.phone;
+        document.getElementById("userAddress").textContent = user.address;
+        document.getElementById("userReg").textContent = user.regno;
+        
+        const roleText = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        document.getElementById("userRole").textContent = roleText;
+        
+        // Add role badge
+        const roleBadge = document.getElementById("roleBadge");
+        roleBadge.textContent = user.role.toUpperCase();
+        roleBadge.className = `role-badge ${user.role}`;
+
+      } catch (err) {
+        document.getElementById("profileCard").innerHTML = `
+          <div class="text-center">
+            <h3 class="text-danger">Failed to load profile</h3>
+            <p>${err.message}</p>
+            <button class="btn btn-primary mt-3" onclick="window.location.href='index.html'">Go Home</button>
+          </div>
+        `;
+        console.error(err);
+      }
+    }
+
+    // Load message count for navbar
+    async function loadMessageCount() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('messageCount').textContent = data.count;
+        }
+      } catch (err) {
+        console.error('Error loading message count:', err);
+      }
+    }
+
+    function viewMessages() {
+      window.location.href = 'messages.html';
+    }
   </script>
 </body>
 </html>
