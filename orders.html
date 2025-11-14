@@ -3,106 +3,214 @@
 <head>
   <meta charset="UTF-8">
   <title>My Orders - CampusConnect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-<style>
+
+  <style>
+    /* Theme Variables */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      --text-light: #f8f9fa;
+      --text-dark: #2d3436;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      --radius-lg: 16px;
+      --transition: all 0.3s ease-in-out;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 90px;
+    }
+
+   /* Unified Navbar */
+    .navbar {
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #fff !important;
+    }
+
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #ffd43b !important;
+      transform: translateY(-2px);
+    }
+    /* Main Container */
     .main-content {
-        margin-top: 120px;
-        min-height: calc(100vh - 200px);
+      margin: 40px auto;
+      max-width: 900px;
     }
+
+    /* Order Cards */
     .order-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-xl);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        width: 100%;
-        max-width: 350px;
-        margin-left: auto;
-        margin-right: auto;
-        transition: all var(--transition-normal);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        position: relative;
+      background: var(--card-bg);
+      color: var(--text-dark);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      transition: var(--transition);
     }
-    .order-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--success-gradient);
-    }
+
     .order-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-2xl);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
     }
+
     .order-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: var(--radius-lg);
-        margin-bottom: 1rem;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(0, 0, 0, 0.1);
     }
+
+    .order-details {
+      flex: 1;
+    }
+
     .ordered-text {
-        color: var(--success-color);
-        font-weight: bold;
-        font-size: 1.1rem;
+      color: green;
+      font-weight: bold;
     }
-    .free-price {
-        color: var(--success-color);
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
+
     .cancel-btn {
-        margin-top: 1rem;
-        width: 100%;
+      width: 150px;
     }
-</style>
+
+    .free-price {
+      color: green;
+      font-weight: 600;
+    }
+
+    /* Modal Styles */
+    .modal-header.bg-success,
+    .modal-header.bg-danger,
+    .modal-header.bg-warning,
+    .modal-header.bg-primary {
+      color: white;
+    }
+
+    /* ===== Custom Confirmation Popup ===== */
+    .confirm-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .confirm-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .confirm-box {
+      background: #fff;
+      color: #333;
+      border-radius: 14px;
+      padding: 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+    }
+
+    .confirm-overlay.active .confirm-box {
+      transform: scale(1);
+    }
+
+    .confirm-box h5 {
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .confirm-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .confirm-btn {
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .confirm-yes {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: #000;
+    }
+
+    .confirm-no {
+      background: #555;
+      color: #fff;
+    }
+
+    .confirm-btn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
-<body class="container py-4">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
-        </div>
-        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
+      <a class="navbar-brand" href="#">CampusConnect 🎓</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navLinks"></ul>
+        <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Login</button>
       </div>
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 70px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
-
-  <!-- Custom Feedback Modal -->
+  <!-- Feedback Modal -->
   <div class="modal fade" id="feedbackModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header" id="feedbackHeader">
+        <div class="modal-header bg-primary text-white" id="feedbackHeader">
           <h5 class="modal-title" id="feedbackTitle">
             <i class="fas fa-info-circle me-2"></i>Notification
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body" id="feedbackMessage">
-          <!-- Message will be inserted here -->
-        </div>
+        <div class="modal-body" id="feedbackMessage"></div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
         </div>
@@ -110,25 +218,37 @@
     </div>
   </div>
 
-  <h3 class="text-center text-light fw-bold mb-4">My Orders</h3>
+  <!-- Custom Cancel Confirmation -->
+  <div class="confirm-overlay" id="confirmPopup">
+    <div class="confirm-box">
+      <h5>Are you sure you want to cancel this order?</h5>
+      <div class="confirm-buttons">
+        <button class="confirm-btn confirm-yes" id="confirmYes">YES</button>
+        <button class="confirm-btn confirm-no" id="confirmNo">NO</button>
+      </div>
+    </div>
+  </div>
 
-  <div id="ordersContainer"></div>
-
-  <div class="text-center">
-    <a href="index.html" class="btn btn-light mt-3">Back to Home</a>
+  <!-- Page Content -->
+  <div class="main-content">
+    <h3 class="text-center text-light fw-bold mb-4">My Orders</h3>
+    <div id="ordersContainer"></div>
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-light">Back to Home</a>
+    </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    // Custom feedback function
     function showFeedback(message, type = 'info') {
       const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
       const header = document.getElementById('feedbackHeader');
       const title = document.getElementById('feedbackTitle');
       const messageEl = document.getElementById('feedbackMessage');
-      
-      switch(type) {
+
+      switch (type) {
         case 'success':
           header.className = 'modal-header bg-success text-white';
           title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
@@ -145,55 +265,46 @@
           header.className = 'modal-header bg-primary text-white';
           title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
       }
-      
+
       messageEl.textContent = message;
       modal.show();
     }
 
-    // Check authentication on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const token = localStorage.getItem('token');
       if (!token) {
-        showFeedback('Please login first to access this page', 'warning', true, 'login.html');
+        showFeedback('Please login first to access this page', 'warning');
         return;
       }
       updateNavbar();
       loadOrders();
     });
 
-    // Navbar functionality
     function updateNavbar() {
       const token = localStorage.getItem('token');
       const userRole = localStorage.getItem('userRole');
       const authButton = document.getElementById('authButton');
       const navLinks = document.getElementById('navLinks');
-      
+
       if (token) {
         authButton.textContent = 'Sign Out';
-        authButton.className = 'btn btn-outline-danger';
-        
-        let adminLink = '';
-        if (userRole === 'admin') {
-          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-        }
-        
+        authButton.className = 'btn btn-outline-light';
+        let adminLink = userRole === 'admin' ? `<li class="nav-item"><a class="nav-link" href="admin_dashboard.html">Admin Panel</a></li>` : '';
         navLinks.innerHTML = `
           ${adminLink}
-          <a class="nav-link" href="index.html">Home</a>
-          <a class="nav-link" href="profile.html">View Profile</a>
-          <a class="nav-link" href="orders.html">My Orders</a>
-          <a class="nav-link" href="feedback.html">Feedback</a>
-          <a class="nav-link" href="contact.html">Contact Us</a>
-          <a class="nav-link" href="services.html">Services</a>
-          <a class="nav-link" href="address.html">Address</a>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link active" href="orders.html">My Orders</a></li>
+          <li class="nav-item"><a class="nav-link" href="feedback.html">Feedback</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
         `;
       } else {
         authButton.textContent = 'Login';
-        authButton.className = 'btn btn-outline-primary';
         navLinks.innerHTML = `
-          <a class="nav-link" href="contact.html">Contact Us</a>
-          <a class="nav-link" href="services.html">Services</a>
-          <a class="nav-link" href="address.html">Address</a>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
         `;
       }
     }
@@ -201,10 +312,7 @@
     function handleAuth() {
       const token = localStorage.getItem('token');
       if (token) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userRole');
+        localStorage.clear();
         updateNavbar();
         window.location.href = 'index.html';
       } else {
@@ -217,7 +325,6 @@
         const buyerId = localStorage.getItem("userId");
         const res = await fetch(`http://localhost:5000/api/orders?buyerId=${buyerId}`);
         const orders = await res.json();
-
         const container = $("#ordersContainer");
         container.empty();
 
@@ -229,23 +336,19 @@
         orders.forEach(order => {
           const prod = order.product || {};
           const img = prod.imagePath ? `http://localhost:5000/${prod.imagePath}` : "https://via.placeholder.com/200x150?text=No+Image";
-          
-          // Check if product is free (price = 0)
-          const priceDisplay = prod.price === 0 ? 
-            '<span class="free-price">💰 Price: FREE</span>' : 
-            `💰 Price: ₹${prod.price}`;
-
+          const priceDisplay = prod.price === 0 ? '<span class="free-price">💰 FREE</span>' : `💰 ₹${prod.price}`;
           const card = `
             <div class="order-card">
-              <img src="${img}" alt="${prod.title || 'Product'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
-              <h5>${prod.title || "Unnamed Product"}</h5>
-              <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
-              <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
-              <p>${priceDisplay}</p>
-              <p class="ordered-text">✅ Ordered Successfully</p>
-              <button class="btn btn-danger cancel-btn" data-id="${order._id}">Cancel Order</button>
-            </div>
-          `;
+              <img src="${img}" alt="${prod.title || 'Product'}">
+              <div class="order-details">
+                <h5>${prod.title || "Unnamed Product"}</h5>
+                <p>👤 Seller: ${prod.user?.name || "Unknown"}</p>
+                <p>📞 Contact: ${prod.user?.phone || "N/A"}</p>
+                <p>${priceDisplay}</p>
+                <p class="ordered-text">✅ Ordered Successfully</p>
+                <button class="btn btn-danger cancel-btn mt-2" data-id="${order._id}">Cancel Order</button>
+              </div>
+            </div>`;
           container.append(card);
         });
       } catch (err) {
@@ -254,86 +357,32 @@
       }
     }
 
-    $(document).on("click", ".cancel-btn", async function() {
-      const id = $(this).data("id");
-      
-      // Use custom confirmation modal instead of native confirm
-      const confirmMessage = "Are you sure you want to cancel this order?";
-      
-      // Create a custom confirmation modal
-      const confirmModal = `
-        <div class="modal fade" id="confirmCancelModal" tabindex="-1">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title">
-                  <i class="fas fa-exclamation-triangle me-2"></i>Confirm Cancellation
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                ${confirmMessage}
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
-                <button type="button" class="btn btn-danger" id="confirmCancelBtn">Yes, Cancel Order</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Remove any existing modal and add new one
-      $("#confirmCancelModal").remove();
-      $("body").append(confirmModal);
-      
-      const modal = new bootstrap.Modal(document.getElementById('confirmCancelModal'));
-      modal.show();
-      
-      // Handle confirmation
-      $("#confirmCancelBtn").off('click').on('click', async function() {
-        modal.hide();
-        
-        try {
-          const res = await fetch(`http://localhost:5000/api/orders/${id}`, { 
-            method: "DELETE" 
-          });
-          const data = await res.json();
-          
-          if (res.ok) {
-            showFeedback(data.message || "Order cancelled successfully!", "success");
-            loadOrders();
-          } else {
-            showFeedback(data.error || "Failed to cancel order", "error");
-          }
-        } catch (err) {
-          showFeedback("Error cancelling order: " + err.message, "error");
-        }
-      });
+    // === Custom Confirmation Logic ===
+    let cancelId = null;
+    $(document).on("click", ".cancel-btn", function () {
+      cancelId = $(this).data("id");
+      document.getElementById("confirmPopup").classList.add("active");
     });
 
-    // Load message count for navbar
-    async function loadMessageCount() {
+    document.getElementById("confirmNo").addEventListener("click", () => {
+      document.getElementById("confirmPopup").classList.remove("active");
+    });
+
+    document.getElementById("confirmYes").addEventListener("click", async () => {
+      document.getElementById("confirmPopup").classList.remove("active");
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById('messageCount').textContent = data.count;
+        const res = await fetch(`http://localhost:5000/api/orders/${cancelId}`, { method: "DELETE" });
+        const data = await res.json();
+        if (res.ok) {
+          showFeedback(data.message || "Order cancelled successfully!", "success");
+          loadOrders();
+        } else {
+          showFeedback(data.error || "Failed to cancel order", "error");
         }
       } catch (err) {
-        console.error('Error loading message count:', err);
+        showFeedback("Error cancelling order: " + err.message, "error");
       }
-    }
-
-    function viewMessages() {
-      window.location.href = 'messages.html';
-    }
+    });
   </script>
 </body>
 </html>

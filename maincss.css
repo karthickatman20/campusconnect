@@ -52,6 +52,7 @@
 
 body {
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: src('C:/Users/Dinesh/Pictures/project_final/New folder (2)/campus_connect_frontend/homeimg.jpg');
   line-height: 1.6;
   color: var(--text-dark);
   background: var(--primary-gradient);

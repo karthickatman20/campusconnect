@@ -4,327 +4,298 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Manage Admins - CampusConnect Admin</title>
+
+  <!-- Bootstrap & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-<style>
+
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --accent-gradient: linear-gradient(135deg, #43e97b, #38f9d7);
+      --radius-lg: 18px;
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+      --transition: 0.3s ease;
+    }
+
+    body {
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      padding-top: 90px;
+    }
+
+    /* Navbar same as Home Page */
+    .navbar {
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-lg);
+      z-index: 9999;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      color: #fff !important;
+    }
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      transition: var(--transition);
+    }
+    .nav-link:hover {
+      color: #ffd43b !important;
+      transform: translateY(-2px);
+    }
+
+    /* Search bar */
+    .search-bar {
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+
+    /* Admin Cards */
     .admin-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-xl);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        transition: all var(--transition-normal);
-        border: 2px solid var(--danger-color);
-        border-left: 6px solid var(--danger-color);
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #dc3545;
+      color: #fff;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
     .admin-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-2xl);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
     .current-user {
-        background: rgba(40, 167, 69, 0.1);
-        border-color: var(--success-color);
+      border-left: 5px solid #38f9d7;
+      background: rgba(67, 233, 123, 0.1);
     }
-    .search-bar {
-        max-width: 400px;
-        margin: 0 auto 2rem;
+
+    .btn-warning, .btn-danger {
+      border-radius: 8px;
+      font-weight: 500;
     }
-</style>
+
+    footer {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 15px 0;
+      margin-top: 60px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Modern modal styles */
+    .modal-content.glass {
+      backdrop-filter: blur(12px);
+      background: rgba(17, 25, 40, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      color: #fff;
+    }
+    .modal-header.glass {
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      color: #222;
+    }
+  </style>
 </head>
 <body class="d-flex flex-column">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Manage Admins</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
+      <a class="navbar-brand" href="#">CampusConnect 🎓</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="siteNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navLinks"></ul>
+
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3">
+            <button id="messageBtn" class="btn btn-outline-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell"></i>
+              <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Sign Out</button>
         </div>
-        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
       </div>
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
+  <!-- Page Content -->
+  <div class="container mt-4">
+    <h2 class="text-center mb-4 fw-bold text-warning">Manage Administrators</h2>
 
-  <!-- Custom Feedback Modal -->
-  <div class="modal fade" id="feedbackModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header" id="feedbackHeader">
-          <h5 class="modal-title" id="feedbackTitle">
-            <i class="fas fa-info-circle me-2"></i>Notification
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="feedbackMessage">
-          <!-- Message will be inserted here -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <h2 class="text-center mb-4 fw-bold">Manage Administrators</h2>
-
-    <!-- Search Bar -->
     <div class="search-bar">
-      <input type="text" id="searchAdmins" class="form-control" placeholder="Search admins by name or email...">
+      <input type="text" id="searchAdmins" class="form-control shadow-sm" placeholder="Search admins by name or email...">
     </div>
 
-    <div id="adminsContainer">
-      <!-- Admins will be loaded here -->
-    </div>
+    <div id="adminsContainer"></div>
 
     <div class="text-center mt-4">
-      <a href="admin_dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+      <a href="admin_dashboard.html" class="btn btn-outline-light px-4">Back to Dashboard</a>
     </div>
   </div>
 
+  <footer>
+    © 2025 CampusConnect | All Rights Reserved
+  </footer>
+
+  <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    // Custom feedback function
-    function showFeedback(message, type = 'info') {
-      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-      const header = document.getElementById('feedbackHeader');
-      const title = document.getElementById('feedbackTitle');
-      const messageEl = document.getElementById('feedbackMessage');
-      
-      switch(type) {
-        case 'success':
-          header.className = 'modal-header bg-success text-white';
-          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
-          break;
-        case 'error':
-          header.className = 'modal-header bg-danger text-white';
-          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
-          break;
-        case 'warning':
-          header.className = 'modal-header bg-warning text-white';
-          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
-          break;
-        default:
-          header.className = 'modal-header bg-primary text-white';
-          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
-      }
-      
-      messageEl.textContent = message;
-      modal.show();
-    }
-
-    let currentUserId = localStorage.getItem('userId');
-
-    // Check authentication and admin role
-    document.addEventListener('DOMContentLoaded', function() {
-      const token = localStorage.getItem('token');
-      const userRole = localStorage.getItem('userRole');
-      
-      if (!token || userRole !== 'admin') {
-        showFeedback('Access denied. Admin privileges required.', 'error', true, 'index.html');
-        return;
-      }
-      
-      updateNavbar();
-      loadAdmins();
-    });
-
-    // Navbar functionality
+    // Navbar setup same as home page
     function updateNavbar() {
       const navLinks = document.getElementById('navLinks');
-      navLinks.innerHTML = `
-        <a class="nav-link" href="admin_dashboard.html">Dashboard</a>
-        <a class="nav-link" href="users_data.html">Users</a>
-        <a class="nav-link" href="products_data.html">Products</a>
-        <a class="nav-link" href="feedback_data.html">Feedback</a>
-        <a class="nav-link" href="admin_data.html">Admins</a>
-        <a class="nav-link" href="index.html">Home</a>
-      `;
+      const authButton = document.getElementById('authButton');
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('userRole');
+
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        let adminLink = role === 'admin' ? '<li class="nav-item"><a class="nav-link" href="admin_dashboard.html">Admin Panel</a></li>' : '';
+        navLinks.innerHTML = `
+          ${adminLink}
+          <li class="nav-item"><a class="nav-link active" href="admin_data.html">Admins</a></li>
+          <li class="nav-item"><a class="nav-link" href="users_data.html">Users</a></li>
+          <li class="nav-item"><a class="nav-link" href="products_data.html">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="feedback_data.html">Feedback</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        `;
+      }
     }
 
     function handleAuth() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userRole');
+      localStorage.clear();
       window.location.href = 'index.html';
     }
 
-    // Load all admins
+    // Load Admins
+    let currentUserId = localStorage.getItem('userId');
+
     async function loadAdmins() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/admin/admins', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+        const res = await fetch('http://localhost:5000/api/admin/admins', {
+          headers: { 'Authorization': 'Bearer ' + token }
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to load admins');
-        }
+        const data = await res.json();
 
         const container = $("#adminsContainer");
         container.empty();
 
-        if (!data.admins.length) {
-          container.html('<p class="text-center">No admins found.</p>');
+        if (!data.admins || !data.admins.length) {
+          container.html('<p class="text-center text-muted">No admins found.</p>');
           return;
         }
 
         data.admins.forEach(admin => {
-          const isCurrentUser = admin._id === currentUserId;
-          const cardClass = isCurrentUser ? 'admin-card current-user' : 'admin-card';
-          
-          const adminCard = `
-            <div class="${cardClass}">
-              ${isCurrentUser ? '<span class="badge bg-success mb-2">Current User</span>' : ''}
-              
+          const isCurrent = admin._id === currentUserId;
+          const card = `
+            <div class="admin-card ${isCurrent ? 'current-user' : ''}">
+              ${isCurrent ? '<span class="badge bg-success mb-2">Current User</span>' : ''}
               <div class="row">
                 <div class="col-md-8">
                   <h5 class="fw-bold">${admin.name}</h5>
-                  <p class="mb-1"><strong>Email:</strong> ${admin.email}</p>
-                  <p class="mb-1"><strong>Reg No:</strong> ${admin.regno}</p>
-                  <p class="mb-1"><strong>Phone:</strong> ${admin.phone}</p>
-                  <p class="mb-1"><strong>Address:</strong> ${admin.address}</p>
-                  <p class="mb-0"><strong>Joined:</strong> ${new Date(admin.createdAt).toLocaleDateString()}</p>
+                  <p><strong>Email:</strong> ${admin.email}</p>
+                  <p><strong>Reg No:</strong> ${admin.regno}</p>
+                  <p><strong>Phone:</strong> ${admin.phone || 'N/A'}</p>
+                  <p><strong>Address:</strong> ${admin.address || 'N/A'}</p>
+                  <p><strong>Joined:</strong> ${new Date(admin.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                  <div class="btn-group-vertical w-100">
-                    <button class="btn btn-warning btn-sm mb-2" onclick="editAdmin('${admin._id}')" ${isCurrentUser ? 'disabled' : ''}>
-                      <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="removeAdmin('${admin._id}', '${admin.name}')" ${isCurrentUser ? 'disabled' : ''}>
-                      <i class="fas fa-trash"></i> Remove
-                    </button>
-                    ${isCurrentUser ? '<small class="text-muted">Cannot edit/remove yourself</small>' : ''}
-                  </div>
+                  <button class="btn btn-warning btn-sm mb-2" onclick="editAdmin('${admin._id}')" ${isCurrent ? 'disabled' : ''}>
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="removeAdmin('${admin._id}', '${admin.name}')" ${isCurrent ? 'disabled' : ''}>
+                    <i class="fas fa-trash"></i> Remove
+                  </button>
                 </div>
               </div>
-            </div>
-          `;
-          container.append(adminCard);
+            </div>`;
+          container.append(card);
         });
 
-        // Add search functionality
         $("#searchAdmins").on("keyup", function() {
           const value = $(this).val().toLowerCase();
           $(".admin-card").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
           });
         });
-
       } catch (err) {
-        console.error('Error loading admins:', err);
-        $("#adminsContainer").html('<p class="text-center text-danger">Failed to load admins.</p>');
+        $("#adminsContainer").html('<p class="text-danger text-center">Failed to load admins.</p>');
       }
     }
 
-// Remove admin
-async function removeAdmin(adminId, adminName) {
-  // Create custom confirmation modal
-  const confirmModal = `
-    <div class="modal fade" id="confirmRemoveModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header bg-warning text-white">
-            <h5 class="modal-title">
-              <i class="fas fa-exclamation-triangle me-2"></i>Confirm Removal
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    // ✨ Modern Glass Confirmation Popup
+    async function removeAdmin(adminId, adminName) {
+      $("#confirmRemoveModal").remove();
+      const confirmModal = `
+        <div class="modal fade" id="confirmRemoveModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass">
+              <div class="modal-header glass">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body text-white">
+                Are you sure you want to remove admin "<strong>${adminName}</strong>"? This action cannot be undone.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Yes, Remove</button>
+              </div>
+            </div>
           </div>
-          <div class="modal-body">
-            Are you sure you want to remove admin "${adminName}"? This action cannot be undone.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Yes, Remove Admin</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Remove any existing modal and add new one
-  $("#confirmRemoveModal").remove();
-  $("body").append(confirmModal);
-  
-  const modal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
-  modal.show();
-  
-  // Handle confirmation
-  $("#confirmRemoveBtn").off('click').on('click', async function() {
-    modal.hide();
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/admins/${adminId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
+        </div>`;
+      
+      $("body").append(confirmModal);
+      const modal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
+      modal.show();
+      
+      $("#confirmRemoveBtn").off("click").on("click", async () => {
+        modal.hide();
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`http://localhost:5000/api/admin/admins/${adminId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Failed to delete admin");
+          alert("✅ Admin removed successfully!");
+          loadAdmins();
+        } catch (err) {
+          alert("❌ " + err.message);
         }
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to remove admin');
-      }
-
-      showFeedback('Admin removed successfully!', 'success');
-      loadAdmins();
-
-    } catch (err) {
-      showFeedback('Error: ' + err.message, 'error');
     }
-  });
-}
 
-    // Load message count for navbar
-    async function loadMessageCount() {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById('messageCount').textContent = data.count;
-        }
-      } catch (err) {
-        console.error('Error loading message count:', err);
-      }
+    function editAdmin(id) {
+      window.location.href = `edit_admin.html?id=${id}`;
     }
 
     function viewMessages() {
       window.location.href = 'messages.html';
     }
 
-    // Edit admin - redirect to edit page
-    function editAdmin(adminId) {
-      window.location.href = `edit_admin.html?id=${adminId}`;
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavbar();
+      loadAdmins();
+    });
   </script>
 </body>
 </html>

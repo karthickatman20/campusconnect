@@ -4,175 +4,247 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Profile - CampusConnect</title>
+
+  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-<style>
-    .profile-page-body {
-        min-height: 100vh;
-        background: var(--primary-gradient);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+
+  <style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+    --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --text-dark: #2d3748;
+    --text-light: #718096;
+    --white: #ffffff;
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-2xl: 0 25px 50px rgba(0,0,0,0.15);
+    --radius-lg: 16px;
+    --radius-2xl: 24px;
+    --transition-normal: all 0.3s ease;
+  }
+
+  body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      padding-top: 90px;
+  }
+
+  /* Unified Navbar */
+  .navbar {
+    background: var(--primary-gradient);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .navbar-brand {
+    font-weight: 700;
+    color: #fff !important;
+  }
+
+  .nav-link {
+    color: #fff !important;
+    font-weight: 500;
+    margin: 0 8px;
+    transition: 0.3s;
+  }
+
+  .nav-link:hover {
+    color: #ffd43b !important;
+    transform: translateY(-2px);
+  }
+
+  .message-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--danger-gradient);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  /* Profile Card */
+  .profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+
+  .profile-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(30px);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    padding: 3rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.8s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
     }
-    .profile-container {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-        width: 100%;
-        margin-top: 120px;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .profile-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(30px);
-        border-radius: var(--radius-2xl);
-        box-shadow: var(--shadow-2xl);
-        padding: 3rem;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        position: relative;
-        overflow: hidden;
-        max-width: 500px;
-        width: 100%;
-        text-align: center;
-        color: var(--text-dark);
-        animation: slideIn 0.8s ease-out;
-    }
-    .profile-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 8px;
-        background: var(--primary-gradient);
-    }
-    .profile-avatar {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 4px solid var(--white);
-        box-shadow: var(--shadow-xl);
-        margin: 0 auto 1.5rem;
-        position: relative;
-        overflow: hidden;
-        transition: var(--transition-normal);
-        background: var(--primary-gradient);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 3rem;
-    }
-    .profile-avatar:hover {
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-    }
-    .profile-name {
-        font-weight: 700;
-        font-size: 1.8rem;
-        margin-bottom: 0.5rem;
-        background: var(--primary-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    .profile-subtitle {
-        color: var(--text-light);
-        margin-bottom: 2rem;
-        font-size: 1rem;
-    }
-    .profile-info {
-        text-align: left;
-        margin-top: 1.5rem;
-    }
-    .profile-info-item {
-        background: rgba(102, 126, 234, 0.1);
-        padding: 1rem 1.5rem;
-        border-radius: var(--radius-lg);
-        margin-bottom: 1rem;
-        border-left: 4px solid var(--primary-color);
-        transition: var(--transition-normal);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .profile-info-item:hover {
-        background: rgba(102, 126, 234, 0.2);
-        transform: translateX(10px);
-    }
-    .profile-info-item i {
-        font-size: 1.2rem;
-        color: var(--primary-color);
-        width: 20px;
-    }
-    .profile-info-text {
-        flex: 1;
-    }
-    .btn-profile-back {
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        border-radius: var(--radius-lg);
-        padding: 0.8rem 2rem;
-        font-weight: 600;
-        margin-top: 2rem;
-        transition: var(--transition-normal);
-        box-shadow: var(--shadow-md);
-        width: 100%;
-    }
-    .btn-profile-back:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-xl);
-    }
-    .role-badge {
-        background: var(--success-gradient);
-        color: white;
-        padding: 0.3rem 1rem;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-left: 0.5rem;
-    }
-    .role-badge.admin {
-        background: var(--danger-gradient);
-    }
-</style>
+  }
+
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--primary-gradient);
+  }
+
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid var(--white);
+    box-shadow: var(--shadow-lg);
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    background: var(--primary-gradient);
+    color: white;
+    transition: var(--transition-normal);
+  }
+
+  .profile-avatar:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+  }
+
+  .profile-name {
+    font-weight: 700;
+    font-size: 1.8rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .profile-subtitle {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+  }
+
+  .profile-info {
+    text-align: left;
+    margin-top: 1.5rem;
+  }
+
+  .profile-info-item {
+    background: rgba(102, 126, 234, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    border-left: 4px solid #667eea;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition-normal);
+  }
+
+  .profile-info-item:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(10px);
+  }
+
+  .profile-info-item i {
+    font-size: 1.2rem;
+    color: #667eea;
+    width: 20px;
+  }
+
+  .profile-info-text {
+    flex: 1;
+  }
+
+  .btn-profile-back {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    transition: var(--transition-normal);
+  }
+
+  .btn-profile-back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  }
+
+  .role-badge {
+    background: var(--success-gradient);
+    color: white;
+    padding: 0.3rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+  }
+
+  .role-badge.admin {
+    background: var(--danger-gradient);
+  }
+  </style>
 </head>
+
 <body class="profile-page-body">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
+      <a class="navbar-brand" href="#">CampusConnect 🎓</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav me-auto" id="navLinks"></div>
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+            <button class="btn btn-outline-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell"></i>
+              <span class="message-badge" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Login</button>
         </div>
-        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 70px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
-
+  <!-- Profile Section -->
   <div class="profile-container">
     <div class="profile-card" id="profileCard">
-      <div class="profile-avatar">
-        <i class="fas fa-user"></i>
-      </div>
-      
+      <div class="profile-avatar"><i class="fas fa-user"></i></div>
       <h3 class="profile-name" id="userName">Loading...</h3>
       <p class="profile-subtitle">CampusConnect Member</p>
 
@@ -194,7 +266,8 @@
         <div class="profile-info-item">
           <i class="fas fa-map-marker-alt"></i>
           <div class="profile-info-text">
-            <strong>Address:</strong> <span id="userAddress">Fetching...</span>
+            <strong>Address:</strong> 
+            <span id="userAddress">Fetching...</span>
           </div>
         </div>
         
@@ -232,6 +305,7 @@
       }
       updateNavbar();
       loadUserProfile();
+      loadMessageCount(); // Load message count for authenticated users
     });
 
     // Navbar functionality
@@ -240,10 +314,14 @@
       const userRole = localStorage.getItem('userRole');
       const authButton = document.getElementById('authButton');
       const navLinks = document.getElementById('navLinks');
+      const messageButtonContainer = document.getElementById('messageButtonContainer');
       
       if (token) {
         authButton.textContent = 'Sign Out';
-        authButton.className = 'btn btn-outline-danger';
+        authButton.className = 'btn btn-outline-light';
+        
+        // Show message button for authenticated users
+        messageButtonContainer.style.display = 'block';
         
         let adminLink = '';
         if (userRole === 'admin') {
@@ -262,8 +340,10 @@
         `;
       } else {
         authButton.textContent = 'Login';
-        authButton.className = 'btn btn-outline-primary';
+        authButton.className = 'btn btn-outline-light';
+        messageButtonContainer.style.display = 'none';
         navLinks.innerHTML = `
+          <a class="nav-link" href="index.html">Home</a>
           <a class="nav-link" href="contact.html">Contact Us</a>
           <a class="nav-link" href="services.html">Services</a>
           <a class="nav-link" href="address.html">Address</a>
@@ -305,7 +385,12 @@
         document.getElementById("userName").textContent = user.name;
         document.getElementById("userEmail").textContent = user.email;
         document.getElementById("userPhone").textContent = user.phone;
-        document.getElementById("userAddress").textContent = user.address;
+        
+        // Format address for display
+        const address = user.address;
+        const formattedAddress = `${address.doorNo}, ${address.street}, ${address.area}`;
+        document.getElementById("userAddress").textContent = formattedAddress;
+        
         document.getElementById("userReg").textContent = user.regno;
         
         const roleText = user.role.charAt(0).toUpperCase() + user.role.slice(1);
@@ -351,5 +436,7 @@
       window.location.href = 'messages.html';
     }
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -4,96 +4,218 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Provide Feedback - CampusConnect</title>
+
+  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-    .main-content {
-        margin-top: 120px;
-        min-height: calc(100vh - 200px);
+  
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --accent-gradient: linear-gradient(135deg, #43e97b, #38f9d7);
+      --warning-gradient: linear-gradient(135deg, #fa709a, #fee140);
+      --text-dark: #2d3748;
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+      --radius-lg: 18px;
     }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      padding-top: 90px;
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-lg);
+    }
+    .navbar-brand {
+      font-weight: 700;
+      color: #fff !important;
+    }
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      transition: 0.3s;
+    }
+    .nav-link:hover {
+      color: #ffd43b !important;
+      transform: translateY(-2px);
+    }
+    .message-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #ff6b6b;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      font-weight: 600;
+    }
+
+    /* Feedback Card */
     .feedback-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-2xl);
-        box-shadow: var(--shadow-2xl);
-        padding: 2.5rem;
-        max-width: 700px;
-        margin: 0 auto;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        animation: slideIn 0.8s ease-out;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      padding: 2.5rem;
+      max-width: 650px;
+      margin: 100px auto;
+      animation: fadeInUp 0.8s ease-out;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.15);
     }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
     .star-rating {
-        font-size: 2rem;
-        color: #ddd;
-        cursor: pointer;
-        transition: var(--transition-normal);
+      font-size: 2rem;
+      color: #ddd;
+      cursor: pointer;
+      transition: 0.3s;
     }
     .star-rating .active {
-        color: #ffc107;
-        transform: scale(1.2);
+      color: #ffc107;
+      transform: scale(1.2);
     }
     .star-rating i:hover {
-        transform: scale(1.3);
-        color: #ffc107;
+      transform: scale(1.3);
+      color: #ffc107;
     }
+
     .feedback-image {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: var(--radius-xl);
-        display: none;
-        margin: 1rem auto;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        box-shadow: var(--shadow-lg);
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      display: none;
+      margin: 1rem auto;
+      border: 3px solid rgba(255,255,255,0.2);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
+
     #ratingText {
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-top: 0.5rem;
+      font-weight: 600;
+      color: #ffd43b;
+      margin-top: 0.5rem;
     }
-</style>
+
+    .btn-gradient {
+      background: var(--accent-gradient);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .btn-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    footer {
+      text-align: center;
+      color: white;
+      background: rgba(0,0,0,0.55);
+      padding: 24px 0;
+      margin-top: 40px;
+    }
+  </style>
 </head>
-<body class="d-flex flex-column">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
+      <a class="navbar-brand" href="index.html">CampusConnect 🎓</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <ul class="navbar-nav" id="navLinks"></ul>
+
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+            <button class="btn btn-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell text-primary"></i>
+              <span class="message-badge" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Login</button>
         </div>
-        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
       </div>
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
+  <!-- Feedback Form -->
+  <div class="feedback-card">
+    <h2 class="text-center mb-4">Provide Your Feedback</h2>
 
-  <!-- Custom Feedback Modal -->
+    <form id="feedbackForm">
+      <div class="mb-4 text-center">
+        <label class="form-label fw-bold">Upload Product Image</label>
+        <input type="file" id="productImage" class="form-control mt-2" accept="image/*" required>
+        <div class="mt-3">
+          <img id="imagePreview" class="feedback-image" alt="Preview">
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold">Your Feedback</label>
+        <textarea id="feedbackText" class="form-control" rows="5" placeholder="Share your experience..." maxlength="500" required></textarea>
+        <small class="text-light"><span id="charCount">0</span>/500 characters</small>
+      </div>
+
+      <div class="mb-4 text-center">
+        <label class="form-label fw-bold mb-2">Rating</label>
+        <div class="star-rating" id="starRating">
+          <i class="fas fa-star" data-rating="1"></i>
+          <i class="fas fa-star" data-rating="2"></i>
+          <i class="fas fa-star" data-rating="3"></i>
+          <i class="fas fa-star" data-rating="4"></i>
+          <i class="fas fa-star" data-rating="5"></i>
+        </div>
+        <input type="hidden" id="ratingValue" required>
+        <div id="ratingText">Click stars to rate</div>
+      </div>
+
+      <button type="submit" class="btn btn-gradient w-100 py-2">Submit Feedback</button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="feedback.html" class="btn btn-outline-light">Back to Feedback</a>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 CampusConnect | Made with ❤️ by Team CampusConnect
+  </footer>
+
+  <!-- Modal -->
   <div class="modal fade" id="feedbackModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header" id="feedbackHeader">
-          <h5 class="modal-title" id="feedbackTitle">
-            <i class="fas fa-info-circle me-2"></i>Notification
-          </h5>
+          <h5 class="modal-title" id="feedbackTitle"></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body" id="feedbackMessage">
-          <!-- Message will be inserted here -->
-        </div>
+        <div class="modal-body" id="feedbackMessage"></div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
         </div>
@@ -101,132 +223,50 @@
     </div>
   </div>
 
-  <div class="container">
-    <div class="feedback-card">
-      <h2 class="text-center mb-4 fw-bold">Provide Your Feedback</h2>
-      
-      <form id="feedbackForm">
-        <div class="mb-4 text-center">
-          <label class="form-label fw-bold h5">Upload Product Image</label>
-          <input type="file" id="productImage" class="form-control mt-2" accept="image/*" required>
-          <div class="mt-3">
-            <img id="imagePreview" class="feedback-image" alt="Product Preview">
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-bold h5">Feedback:</label>
-          <textarea id="feedbackText" class="form-control" rows="5" placeholder="Share your experience with the product..." maxlength="500" required></textarea>
-          <small class="text-muted"><span id="charCount">0</span>/500 characters</small>
-        </div>
-
-        <div class="mb-4 text-center">
-          <label class="form-label fw-bold h5 mb-3">Rating:</label>
-          <div class="star-rating" id="starRating">
-            <i class="fas fa-star" data-rating="1"></i>
-            <i class="fas fa-star" data-rating="2"></i>
-            <i class="fas fa-star" data-rating="3"></i>
-            <i class="fas fa-star" data-rating="4"></i>
-            <i class="fas fa-star" data-rating="5"></i>
-          </div>
-          <input type="hidden" id="ratingValue" required>
-          <div class="mt-2" id="ratingText">Click stars to rate</div>
-        </div>
-
-        <button type="submit" class="btn btn-success btn-lg w-100 py-2">Submit Feedback</button>
-      </form>
-    </div>
-
-    <div class="text-center mt-4">
-      <a href="feedback.html" class="btn btn-outline-primary">Back to Feedback</a>
-    </div>
-  </div>
-
+  <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Custom feedback function
-    function showFeedback(message, type = 'info', autoRedirect = null, redirectUrl = null) {
-      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-      const header = document.getElementById('feedbackHeader');
-      const title = document.getElementById('feedbackTitle');
-      const messageEl = document.getElementById('feedbackMessage');
-      
-      switch(type) {
-        case 'success':
-          header.className = 'modal-header bg-success text-white';
-          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
-          break;
-        case 'error':
-          header.className = 'modal-header bg-danger text-white';
-          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
-          break;
-        case 'warning':
-          header.className = 'modal-header bg-warning text-white';
-          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
-          break;
-        default:
-          header.className = 'modal-header bg-primary text-white';
-          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
-      }
-      
-      messageEl.textContent = message;
-      modal.show();
-      
-      if (autoRedirect && redirectUrl) {
-        setTimeout(() => {
-          modal.hide();
-          window.location.href = redirectUrl;
-        }, 2000);
-      }
-    }
 
-    // Check authentication and update navbar
-    document.addEventListener('DOMContentLoaded', function() {
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        showFeedback('Please sign up to provide feedback', 'warning', true, 'login.html');
+        showFeedback('Please login to provide feedback.', 'warning', true, 'login.html');
         return;
       }
       updateNavbar();
       setupStarRating();
       setupCharacterCounter();
+      loadMessageCount();
     });
 
-    // Navbar functionality
     function updateNavbar() {
       const token = localStorage.getItem('token');
       const userRole = localStorage.getItem('userRole');
-      const authButton = document.getElementById('authButton');
       const navLinks = document.getElementById('navLinks');
-      
+      const authButton = document.getElementById('authButton');
+
       if (token) {
         authButton.textContent = 'Sign Out';
-        authButton.className = 'btn btn-outline-danger';
-        
-        let adminLink = '';
-        if (userRole === 'admin') {
-          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-        }
-        
+        authButton.className = 'btn btn-outline-light';
+        const adminLink = userRole === 'admin' ? `<li class="nav-item"><a class="nav-link" href="admin_dashboard.html">Admin</a></li>` : '';
         navLinks.innerHTML = `
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+          <li class="nav-item"><a class="nav-link active" href="provide_feedback.html">Feedback</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
           ${adminLink}
-          <a class="nav-link" href="index.html">Home</a>
-          <a class="nav-link" href="profile.html">View Profile</a>
-          <a class="nav-link" href="orders.html">My Orders</a>
-          <a class="nav-link" href="feedback.html">Feedback</a>
-          <a class="nav-link" href="contact.html">Contact Us</a>
-          <a class="nav-link" href="services.html">Services</a>
-          <a class="nav-link" href="address.html">Address</a>
         `;
       } else {
         authButton.textContent = 'Login';
-        authButton.className = 'btn btn-outline-primary';
+        authButton.className = 'btn btn-outline-light';
         navLinks.innerHTML = `
-          <a class="nav-link" href="feedback.html">Feedback</a>
-          <a class="nav-link" href="contact.html">Contact Us</a>
-          <a class="nav-link" href="services.html">Services</a>
-          <a class="nav-link" href="address.html">Address</a>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
         `;
       }
     }
@@ -234,54 +274,57 @@
     function handleAuth() {
       const token = localStorage.getItem('token');
       if (token) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userRole');
-        updateNavbar();
+        localStorage.clear();
         window.location.href = 'index.html';
       } else {
         window.location.href = 'login.html';
       }
     }
 
-    // Star rating functionality
+    function showFeedback(message, type = 'info', autoRedirect = false, redirectUrl = null) {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const msg = document.getElementById('feedbackMessage');
+
+      const colors = {
+        success: ['bg-success text-white', 'Success!'],
+        error: ['bg-danger text-white', 'Error!'],
+        warning: ['bg-warning text-dark', 'Warning!'],
+        info: ['bg-primary text-white', 'Info']
+      };
+
+      const [cls, heading] = colors[type] || colors.info;
+      header.className = 'modal-header ' + cls;
+      title.textContent = heading;
+      msg.textContent = message;
+      modal.show();
+
+      if (autoRedirect && redirectUrl) {
+        setTimeout(() => { window.location.href = redirectUrl; }, 2000);
+      }
+    }
+
     function setupStarRating() {
       const stars = document.querySelectorAll('.star-rating i');
       const ratingText = document.getElementById('ratingText');
-      
       stars.forEach(star => {
         star.addEventListener('click', function() {
           const rating = parseInt(this.getAttribute('data-rating'));
           document.getElementById('ratingValue').value = rating;
-          
-          stars.forEach(s => {
-            if (parseInt(s.getAttribute('data-rating')) <= rating) {
-              s.classList.add('active');
-            } else {
-              s.classList.remove('active');
-            }
-          });
-          
-          // Update rating text
-          const ratings = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
-          ratingText.textContent = `${rating}/5 - ${ratings[rating - 1]}`;
-          ratingText.className = 'fw-bold text-warning';
+          stars.forEach(s => s.classList.toggle('active', parseInt(s.getAttribute('data-rating')) <= rating));
+          const labels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+          ratingText.textContent = `${rating}/5 - ${labels[rating - 1]}`;
         });
       });
     }
 
-    // Character counter for feedback text
     function setupCharacterCounter() {
       const textarea = document.getElementById('feedbackText');
-      const charCount = document.getElementById('charCount');
-      
-      textarea.addEventListener('input', function() {
-        charCount.textContent = this.value.length;
-      });
+      const count = document.getElementById('charCount');
+      textarea.addEventListener('input', () => count.textContent = textarea.value.length);
     }
 
-    // Image preview
     $("#productImage").on("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -289,31 +332,16 @@
       $("#imagePreview").attr("src", url).show();
     });
 
-    // Submit feedback form
     $("#feedbackForm").on("submit", async function(e) {
       e.preventDefault();
-
       const feedbackText = $("#feedbackText").val().trim();
       const rating = $("#ratingValue").val();
-      const fileInput = $("#productImage")[0];
-      const file = fileInput ? fileInput.files[0] : null;
+      const file = $("#productImage")[0].files[0];
 
-      if (!file) {
-        showFeedback("Please upload a product image", "warning");
-        return;
-      }
+      if (!file) return showFeedback("Please upload a product image", "warning");
+      if (!feedbackText) return showFeedback("Please enter feedback", "warning");
+      if (!rating) return showFeedback("Please provide a rating", "warning");
 
-      if (!feedbackText) {
-        showFeedback("Please enter your feedback", "warning");
-        return;
-      }
-
-      if (!rating) {
-        showFeedback("Please provide a rating", "warning");
-        return;
-      }
-
-      // Use FormData instead of Cloudinary
       const formData = new FormData();
       formData.append("image", file);
       formData.append("feedbackText", feedbackText);
@@ -323,41 +351,31 @@
         const token = localStorage.getItem('token');
         const response = await fetch("http://localhost:5000/api/feedback", {
           method: "POST",
-          headers: {
-            "Authorization": "Bearer " + token
-          },
+          headers: { "Authorization": "Bearer " + token },
           body: formData
         });
-
         const data = await response.json();
-
-        if (!response.ok) {
-          showFeedback(data.error || "Failed to submit feedback", "error");
-          return;
-        }
-
-        showFeedback("Feedback Successfully Submitted!", "success", true, "index.html");
+        if (!response.ok) return showFeedback(data.error || "Failed to submit feedback", "error");
+        showFeedback("Feedback submitted successfully!", "success", true, "index.html");
       } catch (err) {
         showFeedback("Server error: " + err.message, "error");
       }
     });
 
-    // Load message count for navbar
     async function loadMessageCount() {
       try {
         const token = localStorage.getItem('token');
+        if (!token) return;
         const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+          headers: { 'Authorization': 'Bearer ' + token }
         });
-        
         if (response.ok) {
           const data = await response.json();
           document.getElementById('messageCount').textContent = data.count;
+          document.getElementById('messageButtonContainer').style.display = 'block';
         }
       } catch (err) {
-        console.error('Error loading message count:', err);
+        console.error(err);
       }
     }
 

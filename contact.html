@@ -1,187 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Contact Us - CampusConnect</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
+
+  <!-- Bootstrap + Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+      --radius-lg: 18px;
+    }
+
+     body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 90px;
+    }
+
+    /* Navbar (same as home page) */
+    .navbar {
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #fff !important;
+    }
+
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #ffd43b !important;
+      transform: translateY(-2px);
+    }
+
+    .message-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg,#ff6b6b 0%,#ffa8a8 100%);
+      color: #fff;
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 600;
+    }
+
+    /* Contact Page */
+    .page-title {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 40px;
+      color: #fdfdfd;
+    }
+
     .contact-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-2xl);
-        box-shadow: var(--shadow-2xl);
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        transition: all var(--transition-normal);
+      background: rgb(91, 199, 236);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.4s ease;
+      border: 3px solid transparent;
     }
+
     .contact-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      transform: translateY(-8px);
+      border: 3px solid #667eea;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25);
     }
+
     .contact-card img {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 1rem;
-        border: 3px solid var(--primary-color);
-        box-shadow: var(--shadow-lg);
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 4px solid #764ba2;
     }
+
+    .contact-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .contact-card p {
+      color: #666;
+      margin-bottom: 10px;
+    }
+
     .social-icons a {
-        margin: 0 10px;
-        font-size: 1.5rem;
-        color: var(--text-dark);
-        transition: var(--transition-normal);
+      font-size: 1.4rem;
+      margin: 0 10px;
+      color: #667eea;
+      transition: 0.3s;
     }
+
     .social-icons a:hover {
-        color: var(--primary-color);
-        transform: translateY(-3px);
+      color: #764ba2;
+      transform: scale(1.1);
     }
-</style>
-</head>
-<body class="d-flex flex-column">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-  <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-    <i class="fas fa-bell"></i>
-    <span class="message-badge" id="messageCount">0</span>
-  </button>
-</div>
+    .btn-custom {
+      background: var(--primary-gradient);
+      color: white;
+      font-weight: 500;
+      border-radius: 50px;
+      padding: 10px 30px;
+      transition: all 0.3s ease;
+    }
 
-
-        <button id="authButton" class="btn btn-outline-primary" onclick="handleAuth()">Login</button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
-
-  <div class="container mt-5">
-    <h3 class="fw-bold text-center mb-4">Website Owners</h3>
+    .btn-custom:hover {
+      transform: scale(1.05);
+      color: white;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
     
-    <!-- Owner 1 -->
-    <div class="contact-card text-center">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Owner Photo">
-      <h5 class="fw-bold">S. Karthick</h5>
-      <p>📞 +91 7200308286</p>
-      <div class="social-icons">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
+    /* Custom Feedback Box Styles */
+    .feedback-container {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 350px;
+    }
+
+    .feedback-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 15px;
+      box-shadow: var(--shadow-lg);
+      border-left: 5px solid;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    .feedback-box.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .feedback-box.info {
+      border-left-color: #667eea;
+      color: #2d3748;
+    }
+
+    .feedback-box.warning {
+      border-left-color: #fa709a;
+      color: #2d3748;
+    }
+
+    .feedback-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .feedback-content {
+      flex-grow: 1;
+    }
+
+    .feedback-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feedback-message {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .feedback-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #718096;
+      flex-shrink: 0;
+    }
+
+    .feedback-close:hover {
+      color: #2d3748;
+    }
+
+    @media (max-width:768px) {
+      .feedback-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <!-- 🌈 Unified NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">CampusConnect 🎓</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="siteNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navLinks"></ul>
+
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3">
+            <button id="messageBtn" class="btn btn-outline-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell"></i>
+              <span class="message-badge" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Login</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Custom Feedback Container -->
+  <div class="feedback-container" id="feedbackContainer"></div>
+
+  <!-- 💬 CONTACT SECTION -->
+  <div class="container mt-5">
+    <h2 class="page-title">Meet the Creators</h2>
+    <div class="row justify-content-center g-4">
+
+      <!-- Card 1 -->
+      <div class="col-md-5">
+        <div class="contact-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="S Karthick" />
+          <h5>S. Karthick</h5>
+          <p>📞 +91 7200308286</p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-5">
+        <div class="contact-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="S Dinesh" />
+          <h5>S. Dinesh</h5>
+          <p>📞 +91 6383157534</p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Owner 2 -->
-    <div class="contact-card text-center">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Partner Photo">
-      <h5 class="fw-bold">S. Dinesh</h5>
-      <p>📞 +91 6383157534</p>
-      <div class="social-icons">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
-      </div>
-    </div>
-
-    <div class="text-center">
-      <a href="index.html" class="btn btn-primary mt-3">Back to Home</a>
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-custom">⬅ Back to Home</a>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-// Update navbar
-function updateNavbar() {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
-  const authButton = document.getElementById('authButton');
-  const navLinks = document.getElementById('navLinks');
-  
-  if (token) {
-    authButton.textContent = 'Sign Out';
-    authButton.className = 'btn btn-outline-danger';
-    
-    let adminLink = '';
-    if (userRole === 'admin') {
-      adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-    }
-    
-    navLinks.innerHTML = `
-      ${adminLink}
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="profile.html">View Profile</a>
-      <a class="nav-link" href="orders.html">My Orders</a>
-      <a class="nav-link" href="feedback.html">Feedback</a>
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  } else {
-    authButton.textContent = 'Login';
-    authButton.className = 'btn btn-outline-primary';
-    navLinks.innerHTML = `
-      <a class="nav-link" href="contact.html">Contact Us</a>
-      <a class="nav-link" href="services.html">Services</a>
-      <a class="nav-link" href="address.html">Address</a>
-    `;
-  }
-}
-
-function handleAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    updateNavbar();
-    window.location.href = 'index.html';
-  } else {
-    window.location.href = 'login.html';
-  }
-}
-
-// Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
+    // Custom feedback system
+    function showFeedback(type, title, message) {
+      const container = document.getElementById('feedbackContainer');
+      const id = 'feedback-' + Date.now();
+      
+      let icon, boxClass;
+      if (type === 'warning') {
+        icon = 'fas fa-exclamation-triangle';
+        boxClass = 'feedback-box warning';
+      } else {
+        icon = 'fas fa-info-circle';
+        boxClass = 'feedback-box info';
       }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
+      
+      const feedbackHTML = `
+        <div class="${boxClass}" id="${id}">
+          <i class="${icon} feedback-icon"></i>
+          <div class="feedback-content">
+            <div class="feedback-title">${title}</div>
+            <p class="feedback-message">${message}</p>
+          </div>
+          <button class="feedback-close" onclick="closeFeedback('${id}')">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+      
+      container.insertAdjacentHTML('afterbegin', feedbackHTML);
+      
+      // Show with animation
+      setTimeout(() => {
+        document.getElementById(id).classList.add('show');
+      }, 10);
+      
+      // Auto-close after 5 seconds
+      setTimeout(() => {
+        closeFeedback(id);
+      }, 5000);
     }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
+    
+    function closeFeedback(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.classList.remove('show');
+        setTimeout(() => {
+          if (element.parentNode) {
+            element.parentNode.removeChild(element);
+          }
+        }, 400);
+      }
+    }
 
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
+    // Navbar Sync with Home Page
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('userRole');
+      const navLinks = document.getElementById('navLinks');
+      const authButton = document.getElementById('authButton');
 
-document.addEventListener('DOMContentLoaded', updateNavbar);
+      if (!navLinks || !authButton) return;
+
+      if (token) {
+        authButton.textContent = 'Sign Out';
+        authButton.className = 'btn btn-outline-danger';
+        let admin = role === 'admin' ? '<li class="nav-item"><a class="nav-link" href="admin_dashboard.html">Admin Panel</a></li>' : '';
+        navLinks.innerHTML = `
+          ${admin}
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+          <li class="nav-item"><a class="nav-link" href="feedback.html">Feedback</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-light';
+        navLinks.innerHTML = `
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
+        `;
+      }
+    }
+
+    function handleAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.clear();
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function viewMessages() {
+      if (!localStorage.getItem('token')) { 
+        showFeedback('warning', 'Authentication Required', 'Please login to view messages');
+        return; 
+      }
+      window.location.href = 'messages.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavbar();
+      document.getElementById("messageCount").textContent = 2; // Example count
+    });
   </script>
 </body>
 </html>

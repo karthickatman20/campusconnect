@@ -6,86 +6,271 @@
   <title>Manage Users - CampusConnect Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-<style>
+
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+      --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.2);
+      --shadow-xl: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition-normal: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      padding-top: 100px;
+      color: #2d3748;
+    }
+
+    .navbar {
+      background: var(--primary-gradient) !important;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .navbar-brand, .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: #ffd43b !important;
+    }
+
+    .message-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger-gradient);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
     .main-content {
-        margin-top: 120px;
-        min-height: calc(100vh - 200px);
+      margin-top: 20px;
+      min-height: calc(100vh - 200px);
     }
+
     .user-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-xl);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        transition: all var(--transition-normal);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        position: relative;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition-normal);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
     }
+
     .user-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-2xl);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-2xl);
     }
+
     .user-role-badge {
-        position: absolute;
-        top: 15px;
-        right: 15px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
     }
+
     .search-bar {
-        max-width: 400px;
-        margin: 0 auto 2rem;
+      max-width: 400px;
+      margin: 0 auto 2rem;
     }
-</style>
+
+    .btn-group-vertical .btn {
+      margin-top:50px;
+    }
+
+    /* Custom Modal Styles */
+    .custom-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .custom-modal.show {
+      display: flex;
+    }
+
+    .custom-modal-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-2xl);
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .custom-modal-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .custom-modal-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .custom-modal-icon.info {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .custom-modal-icon.warning {
+      background: linear-gradient(135deg, #ffc107 0%, #ff922b 100%);
+      color: white;
+    }
+
+    .custom-modal-icon.error {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+      color: white;
+    }
+
+    .custom-modal-icon.success {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      color: white;
+    }
+
+    .custom-modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      color: #2d3748;
+    }
+
+    .custom-modal-body {
+      margin-bottom: 1.5rem;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .custom-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .custom-modal-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .custom-modal-btn.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .custom-modal-btn.secondary {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    .custom-modal-btn.danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+      color: white;
+    }
+
+    .custom-modal-btn.warning {
+      background: linear-gradient(135deg, #ffc107 0%, #ff922b 100%);
+      color: white;
+    }
+
+    .custom-modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
 </head>
-<body class="d-flex flex-column">
+<body>
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Manage Users</span>
-      <div class="d-flex">
-        <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
+      <a class="navbar-brand fw-bold" href="#">CampusConnect 🎓 - Manage Users</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav me-auto" id="navLinks"></div>
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3" id="messageButtonContainer" style="display: none;">
+            <button class="btn btn-outline-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell"></i>
+              <span class="message-badge" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Sign Out</button>
         </div>
-        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
       </div>
     </div>
   </nav>
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
+  <!-- Custom Modal Structure -->
+  <div id="customModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <div class="custom-modal-header">
+        <div id="modalIcon" class="custom-modal-icon info">
+          <i class="fas fa-info-circle"></i>
+        </div>
+        <h3 id="modalTitle" class="custom-modal-title">Modal Title</h3>
       </div>
-    </div>
-  </nav>
-
-  <!-- Custom Feedback Modal -->
-  <div class="modal fade" id="feedbackModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header" id="feedbackHeader">
-          <h5 class="modal-title" id="feedbackTitle">
-            <i class="fas fa-info-circle me-2"></i>Notification
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="feedbackMessage">
-          <!-- Message will be inserted here -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-        </div>
+      <div id="modalBody" class="custom-modal-body">
+        Modal content goes here.
+      </div>
+      <div id="modalFooter" class="custom-modal-footer">
+        <!-- Buttons will be added dynamically -->
       </div>
     </div>
   </div>
 
-  <div class="container">
+  <div class="container main-content">
     <h2 class="text-center mb-4 fw-bold">Manage Users</h2>
 
     <!-- Search Bar -->
@@ -105,33 +290,90 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Custom feedback function
-    function showFeedback(message, type = 'info') {
-      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-      const header = document.getElementById('feedbackHeader');
-      const title = document.getElementById('feedbackTitle');
-      const messageEl = document.getElementById('feedbackMessage');
+    // Custom Modal Functions
+    function showCustomModal(options) {
+      const modal = document.getElementById('customModal');
+      const modalIcon = document.getElementById('modalIcon');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      const modalFooter = document.getElementById('modalFooter');
       
-      switch(type) {
-        case 'success':
-          header.className = 'modal-header bg-success text-white';
-          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
-          break;
-        case 'error':
-          header.className = 'modal-header bg-danger text-white';
-          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
-          break;
-        case 'warning':
-          header.className = 'modal-header bg-warning text-white';
-          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
-          break;
-        default:
-          header.className = 'modal-header bg-primary text-white';
-          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      // Set modal content
+      modalIcon.className = `custom-modal-icon ${options.type || 'info'}`;
+      modalIcon.innerHTML = `<i class="fas fa-${getIconForType(options.type)}"></i>`;
+      modalTitle.textContent = options.title || 'Notification';
+      modalBody.innerHTML = options.message || '';
+      
+      // Clear and add buttons
+      modalFooter.innerHTML = '';
+      if (options.buttons) {
+        options.buttons.forEach(button => {
+          const btn = document.createElement('button');
+          btn.className = `custom-modal-btn ${button.type || 'secondary'}`;
+          btn.textContent = button.text;
+          btn.onclick = button.callback;
+          modalFooter.appendChild(btn);
+        });
+      } else {
+        // Default OK button
+        const okBtn = document.createElement('button');
+        okBtn.className = 'custom-modal-btn primary';
+        okBtn.textContent = 'OK';
+        okBtn.onclick = () => hideCustomModal();
+        modalFooter.appendChild(okBtn);
       }
       
-      messageEl.textContent = message;
-      modal.show();
+      // Show modal
+      modal.classList.add('show');
+    }
+    
+    function hideCustomModal() {
+      document.getElementById('customModal').classList.remove('show');
+    }
+    
+    function getIconForType(type) {
+      switch(type) {
+        case 'warning': return 'exclamation-triangle';
+        case 'error': return 'exclamation-circle';
+        case 'success': return 'check-circle';
+        default: return 'info-circle';
+      }
+    }
+    
+    // Custom alert function
+    function customAlert(message, title = 'Notification', type = 'info') {
+      showCustomModal({
+        title: title,
+        message: message,
+        type: type
+      });
+    }
+    
+    // Custom confirm function
+    function customConfirm(message, title = 'Confirmation', callback) {
+      showCustomModal({
+        title: title,
+        message: message,
+        type: 'warning',
+        buttons: [
+          {
+            text: 'Cancel',
+            type: 'secondary',
+            callback: () => {
+              hideCustomModal();
+              if (callback) callback(false);
+            }
+          },
+          {
+            text: 'Confirm',
+            type: 'danger',
+            callback: () => {
+              hideCustomModal();
+              if (callback) callback(true);
+            }
+          }
+        ]
+      });
     }
 
     // Check authentication and admin role
@@ -140,17 +382,26 @@
       const userRole = localStorage.getItem('userRole');
       
       if (!token || userRole !== 'admin') {
-        showFeedback('Access denied. Admin privileges required.', 'error', true, 'index.html');
+        customAlert('Access denied. Admin privileges required.', 'Error', 'error');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
         return;
       }
       
       updateNavbar();
       loadUsers();
+      loadMessageCount();
     });
 
     // Navbar functionality
     function updateNavbar() {
       const navLinks = document.getElementById('navLinks');
+      const messageButtonContainer = document.getElementById('messageButtonContainer');
+      
+      // Show message button for authenticated users
+      messageButtonContainer.style.display = 'block';
+      
       navLinks.innerHTML = `
         <a class="nav-link" href="admin_dashboard.html">Dashboard</a>
         <a class="nav-link" href="users_data.html">Users</a>
@@ -206,7 +457,7 @@
                   <p class="mb-1"><strong>Email:</strong> ${user.email}</p>
                   <p class="mb-1"><strong>Reg No:</strong> ${user.regno}</p>
                   <p class="mb-1"><strong>Phone:</strong> ${user.phone}</p>
-                  <p class="mb-1"><strong>Address:</strong> ${user.address}</p>
+                  <p class="mb-1"><strong>Address:</strong> ${user.address.doorNo}, ${user.address.street}, ${user.address.area}</p>
                   <p class="mb-0"><strong>Joined:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div class="col-md-4 text-end">
@@ -239,65 +490,38 @@
       }
     }
 
-   // Remove user
-async function removeUser(userId, userName) {
-  // Create custom confirmation modal
-  const confirmModal = `
-    <div class="modal fade" id="confirmRemoveModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header bg-warning text-white">
-            <h5 class="modal-title">
-              <i class="fas fa-exclamation-triangle me-2"></i>Confirm Removal
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to remove user "${userName}"? This action cannot be undone.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Yes, Remove User</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Remove any existing modal and add new one
-  $("#confirmRemoveModal").remove();
-  $("body").append(confirmModal);
-  
-  const modal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
-  modal.show();
-  
-  // Handle confirmation
-  $("#confirmRemoveBtn").off('click').on('click', async function() {
-    modal.hide();
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
+    // Remove user
+    async function removeUser(userId, userName) {
+      customConfirm(
+        `Are you sure you want to remove user "${userName}"? This action cannot be undone.`,
+        'Confirm Removal',
+        async (confirmed) => {
+          if (confirmed) {
+            try {
+              const token = localStorage.getItem('token');
+              const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': 'Bearer ' + token
+                }
+              });
+
+              const data = await response.json();
+
+              if (!response.ok) {
+                throw new Error(data.error || 'Failed to remove user');
+              }
+
+              customAlert('User removed successfully!', 'Success', 'success');
+              loadUsers();
+
+            } catch (err) {
+              customAlert('Error: ' + err.message, 'Error', 'error');
+            }
+          }
         }
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to remove user');
-      }
-
-      showFeedback('User removed successfully!', 'success');
-      loadUsers();
-
-    } catch (err) {
-      showFeedback('Error: ' + err.message, 'error');
+      );
     }
-  });
-}
 
     // Edit user - redirect to edit page
     function editUser(userId) {

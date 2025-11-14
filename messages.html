@@ -4,141 +4,313 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Messages - CampusConnect</title>
+  
+  <!-- Bootstrap + Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="maincss.css">
-<style>
-    .main-content {
-        margin-top: 120px;
-        min-height: calc(100vh - 200px);
-    }
-    .message-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-xl);
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all var(--transition-normal);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-left: 5px solid #e2e8f0;
-    }
-    .message-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-2xl);
-    }
-    .message-card.unread {
-        border-left: 5px solid var(--primary-color);
-        background: rgba(102, 126, 234, 0.05);
-    }
-    .message-summary {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border-radius: var(--radius-lg);
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-</style>
-</head>
-<body class="d-flex flex-column">
 
-  <!-- Top Navbar Row 1 -->
-  <nav class="navbar navbar-light bg-light fixed-top nav-row">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">CampusConnect 🎓 - Messages</span>
-      <div class="d-flex">
-        <div class="position-relative me-3">
-          <button class="btn btn-outline-primary position-relative" onclick="viewMessages()">
-            <i class="fas fa-bell"></i>
-            <span class="message-badge" id="messageCount">0</span>
-          </button>
-        </div>
-        <button id="authButton" class="btn btn-outline-danger" onclick="handleAuth()">Sign Out</button>
-      </div>
-    </div>
-  </nav>
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --accent-gradient: linear-gradient(135deg, #43e97b, #38f9d7);
+      --warning-gradient: linear-gradient(135deg, #fa709a, #fee140);
+      --text-dark: #2d3748;
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+      --radius-lg: 18px;
+      --transition-normal: 0.3s ease;
+    }
 
-  <!-- Top Navbar Row 2 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top nav-row" style="top: 56px;">
-    <div class="container-fluid">
-      <div class="navbar-nav" id="navLinks">
-        <!-- Dynamic links -->
-      </div>
-    </div>
-  </nav>
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background: url('homeimg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 90px;
+    }
 
-  <div class="container">
-    <h2 class="text-center mb-4 fw-bold">Your Messages</h2>
+    /* Navbar */
+    .navbar {
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #fff !important;
+    }
+
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #ffd43b !important;
+      transform: translateY(-2px);
+    }
     
-    <div class="d-flex justify-content-between mb-3">
-      <button class="btn btn-success btn-sm" onclick="markAllAsRead()">
-        <i class="fas fa-check-double"></i> Mark All as Read
+    .message-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg,#ff6b6b 0%,#ffa8a8 100%);
+      color: #fff;
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 600;
+    }
+
+    /* Messages Content */
+    .main-content {
+      margin-top: 40px;
+      min-height: calc(100vh - 200px);
+    }
+    
+    .message-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all var(--transition-normal);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-left: 5px solid #e2e8f0;
+    }
+    
+    .message-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    
+    .message-card.unread {
+      border-left: 5px solid #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .message-summary {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Footer */
+    footer { 
+      text-align:center; 
+      color:#fff; 
+      background: rgba(0,0,0,0.55); 
+      padding: 24px 0; 
+      margin-top:40px; 
+    }
+
+    /* Modal Styling */
+    .modal-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @media (max-width:768px) {
+      body { padding-top: 100px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">CampusConnect 🎓 - Messages</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar">
+        <span class="navbar-toggler-icon"></span>
       </button>
-      <span class="text-muted" id="messageSummary">Loading messages...</span>
-    </div>
 
-    <div id="messagesContainer">
-      <!-- Messages will be loaded here -->
-    </div>
+      <div class="collapse navbar-collapse" id="siteNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navLinks">
+          <!-- dynamically populated -->
+        </ul>
 
-    <div class="text-center mt-4">
-      <a href="index.html" class="btn btn-primary">Back to Home</a>
+        <div class="d-flex align-items-center">
+          <div class="position-relative me-3">
+            <button id="messageBtn" class="btn btn-outline-light position-relative" onclick="viewMessages()">
+              <i class="fas fa-bell"></i>
+              <span class="message-badge" id="messageCount">0</span>
+            </button>
+          </div>
+          <button id="authButton" class="btn btn-outline-light" onclick="handleAuth()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container main-content">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <h2 class="text-center mb-4 fw-bold text-white">Your Messages</h2>
+        
+        <div class="message-summary">
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-success btn-sm" onclick="markAllAsRead()">
+              <i class="fas fa-check-double"></i> Mark All as Read
+            </button>
+            <span class="text-muted" id="messageSummary">Loading messages...</span>
+          </div>
+        </div>
+
+        <div id="messagesContainer">
+          <!-- Messages will be loaded here -->
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="index.html" class="btn btn-primary">Back to Home</a>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Check authentication
-    document.addEventListener('DOMContentLoaded', function() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please login first');
-        window.location.href = 'login.html';
-        return;
-      }
-      updateNavbar();
-      loadMessages();
-      loadMessageCount();
-    });
+  <!-- Footer -->
+  <footer>
+    © 2025 CampusConnect | Made by CampusConnect Team
+    <div class="mt-2">
+      <a href="#" class="mx-2 text-white"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="mx-2 text-white"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="mx-2 text-white"><i class="fab fa-linkedin"></i></a>
+    </div>
+  </footer>
 
-    // Navbar functionality
+  <!-- Custom Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="feedbackHeader">
+          <h5 class="modal-title" id="feedbackTitle">
+            <i class="fas fa-info-circle me-2"></i>Notification
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="feedbackMessage">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script>
+    // Populate navbar links
     function updateNavbar() {
       const token = localStorage.getItem('token');
-      const userRole = localStorage.getItem('userRole');
-      const authButton = document.getElementById('authButton');
+      const role = localStorage.getItem('userRole');
       const navLinks = document.getElementById('navLinks');
-      
+      const authButton = document.getElementById('authButton');
+
+      if (!navLinks || !authButton) return;
+
       if (token) {
         authButton.textContent = 'Sign Out';
-        authButton.className = 'btn btn-outline-danger';
-        
-        let adminLink = '';
-        if (userRole === 'admin') {
-          adminLink = '<a class="nav-link" href="admin_dashboard.html">Admin Panel</a>';
-        }
-        
+        authButton.className = 'btn btn-outline-light';
+        let admin = role === 'admin' ? '<li class="nav-item"><a class="nav-link" href="admin_dashboard.html">Admin Panel</a></li>' : '';
         navLinks.innerHTML = `
-          ${adminLink}
-          <a class="nav-link" href="index.html">Home</a>
-          <a class="nav-link" href="profile.html">View Profile</a>
-          <a class="nav-link" href="orders.html">My Orders</a>
-          <a class="nav-link" href="feedback.html">Feedback</a>
-          <a class="nav-link" href="contact.html">Contact Us</a>
-          <a class="nav-link" href="services.html">Services</a>
-          <a class="nav-link" href="address.html">Address</a>
+          ${admin}
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+          <li class="nav-item"><a class="nav-link" href="feedback.html">Feedback</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
+        `;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.className = 'btn btn-outline-light';
+        navLinks.innerHTML = `
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="address.html">Address</a></li>
         `;
       }
     }
 
     function handleAuth() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userRole');
-      window.location.href = 'index.html';
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.clear();
+        updateNavbar();
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'login.html';
+      }
     }
+
+    function viewMessages() {
+      if (!localStorage.getItem('token')) { 
+        showFeedback('Please login to view messages', 'warning'); 
+        return; 
+      }
+      window.location.href = 'messages.html';
+    }
+
+    // Custom feedback function
+    function showFeedback(message, type = 'info') {
+      const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+      const header = document.getElementById('feedbackHeader');
+      const title = document.getElementById('feedbackTitle');
+      const messageEl = document.getElementById('feedbackMessage');
+      
+      switch(type) {
+        case 'success':
+          header.className = 'modal-header bg-success text-white';
+          title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Success!';
+          break;
+        case 'error':
+          header.className = 'modal-header bg-danger text-white';
+          title.innerHTML = '<i class="fas fa-times-circle me-2"></i>Error!';
+          break;
+        case 'warning':
+          header.className = 'modal-header bg-warning text-white';
+          title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Warning!';
+          break;
+        default:
+          header.className = 'modal-header bg-primary text-white';
+          title.innerHTML = '<i class="fas fa-info-circle me-2"></i>Information';
+      }
+      
+      messageEl.textContent = message;
+      modal.show();
+    }
+
+    // Check authentication
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showFeedback('Please login first', 'warning');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+        return;
+      }
+      
+      updateNavbar();
+      loadMessages();
+      loadMessageCount();
+    });
 
     // Load messages
     async function loadMessages() {
@@ -211,59 +383,59 @@
       }
     }
 
-// Mark single message as read
-async function markAsRead(messageId) {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/messages/${messageId}/read`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token
+    // Mark single message as read
+    async function markAsRead(messageId) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/messages/${messageId}/read`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        if (response.ok) {
+          // Update UI
+          $(`#message-${messageId}`).removeClass('unread');
+          $(`#message-${messageId} button`).replaceWith('<span class="badge bg-success ms-3">Read</span>');
+          
+          // Reload message count in navbar
+          loadMessageCount();
+          loadMessages(); // Reload to update summary
+        } else {
+          const data = await response.json();
+          showFeedback(data.error || 'Failed to mark message as read', 'error');
+        }
+      } catch (err) {
+        console.error('Error marking message as read:', err);
+        showFeedback('Network error: Could not mark message as read', 'error');
       }
-    });
-
-    if (response.ok) {
-      // Update UI
-      $(`#message-${messageId}`).removeClass('unread');
-      $(`#message-${messageId} button`).replaceWith('<span class="badge bg-success ms-3">Read</span>');
-      
-      // Reload message count in navbar
-      loadMessageCount();
-      loadMessages(); // Reload to update summary
-    } else {
-      const data = await response.json();
-      showFeedback(data.error || 'Failed to mark message as read', 'error');
     }
-  } catch (err) {
-    console.error('Error marking message as read:', err);
-    showFeedback('Network error: Could not mark message as read', 'error');
-  }
-}
 
-// Mark all messages as read
-async function markAllAsRead() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/mark-all-read', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token
+    // Mark all messages as read
+    async function markAllAsRead() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/messages/mark-all-read', {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        if (response.ok) {
+          showFeedback('All messages marked as read!', 'success');
+          loadMessages();
+          loadMessageCount();
+        } else {
+          const data = await response.json();
+          showFeedback(data.error || 'Failed to mark all messages as read', 'error');
+        }
+      } catch (err) {
+        console.error('Error marking all messages as read:', err);
+        showFeedback('Network error: Could not mark messages as read', 'error');
       }
-    });
-
-    if (response.ok) {
-      showFeedback('All messages marked as read!', 'success');
-      loadMessages();
-      loadMessageCount();
-    } else {
-      const data = await response.json();
-      showFeedback(data.error || 'Failed to mark all messages as read', 'error');
     }
-  } catch (err) {
-    console.error('Error marking all messages as read:', err);
-    showFeedback('Network error: Could not mark messages as read', 'error');
-  }
-}
 
     // Load message count for navbar badge
     async function loadMessageCount() {
@@ -283,36 +455,6 @@ async function markAllAsRead() {
         console.error('Error loading message count:', err);
       }
     }
-
-    function viewMessages() {
-      // Already on messages page, just reload
-      loadMessages();
-      loadMessageCount();
-    }
-
-    // Load message count for navbar
-async function loadMessageCount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/messages/unread-count', {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      document.getElementById('messageCount').textContent = data.count;
-    }
-  } catch (err) {
-    console.error('Error loading message count:', err);
-  }
-}
-
-// View messages function
-function viewMessages() {
-  window.location.href = 'messages.html';
-}
   </script>
 </body>
 </html>
